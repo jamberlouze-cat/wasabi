@@ -16,10 +16,15 @@ const db = {
     { id: "m1", household_id: "hh1", user_id: "u1", name: "Maxime", color: "bleuet", created_at: "2026-09-01T00:00:00Z" },
     { id: "m2", household_id: "hh1", user_id: "u2", name: "Sarah", color: "aubergine", created_at: "2026-09-01T00:01:00Z" },
   ],
-  aisles: [{ id: "a1", household_id: "hh1", key: "autre", name: "Autre", position: 999, deleted_at: null, created_at: now() }],
+  aisles: [
+    { id: "a1", household_id: "hh1", key: "autre", name: "Autre", position: 999, color_key: "maison", deleted_at: null, created_at: now() },
+    { id: "a2", household_id: "hh1", key: "fruits_legumes", name: "Fruits et légumes", position: 10, color_key: "fruits-legumes", deleted_at: null, created_at: now() },
+    { id: "a3", household_id: "hh1", key: "boulangerie", name: "Boulangerie", position: 20, color_key: "boulangerie", deleted_at: null, created_at: now() },
+    { id: "a4", household_id: "hh1", key: "laitiers_oeufs", name: "Produits laitiers et œufs", position: 60, color_key: "laitiers", deleted_at: null, created_at: now() },
+  ],
   household_items: ["Lait", "Pain", "Œufs", "Bananes", "Beurre", "Café", "Yogourt", "Tomates", "Fromage cheddar", "Oignons", "Pommes", "Riz"].map((name, i) => ({
     id: "hi" + i, household_id: "hh1", name, name_normalized: name.toLowerCase().replace("œ", "oe").normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
-    catalog_item_id: null, aisle_id: "a1", use_count: 20 - i, last_used_at: now(), deleted_at: null, created_at: now(),
+    catalog_item_id: null, aisle_id: { Lait: "a4", Pain: "a3", "Œufs": "a4", Bananes: "a2", Tomates: "a2" }[name] || "a1", use_count: 20 - i, last_used_at: now(), deleted_at: null, created_at: now(),
   })),
   grocery_lists: [
     { id: "l1", household_id: "hh1", name: "Épicerie", emoji: "🛒", position: 1, deleted_at: null, created_at: "2026-09-01T00:00:00Z" },

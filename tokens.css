@@ -53,6 +53,7 @@
   --tag-bg: var(--wasabi-100);
   --tag-text: var(--wasabi-800);
   --danger: var(--piment);
+  --on-danger: var(--papier);   /* icône sur fond --danger */
   --focus-ring: var(--wasabi-600);
   --scrim: rgba(14, 15, 12, 0.45);   /* voile derrière une feuille (Noir translucide) */
 
@@ -73,6 +74,7 @@
     --tag-bg: var(--wasabi-950);
     --tag-text: var(--wasabi-500);
     --danger: var(--piment-sombre);
+    --on-danger: var(--noir);
     --focus-ring: var(--wasabi-500);
   }
 }
@@ -90,6 +92,7 @@
   --tag-bg: var(--wasabi-950);
   --tag-text: var(--wasabi-500);
   --danger: var(--piment-sombre);
+  --on-danger: var(--noir);
   --focus-ring: var(--wasabi-500);
 }
 

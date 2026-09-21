@@ -12,6 +12,7 @@ FEUILLE_DE_ROUTE.md
 CHARTE-COULEURS.md
 REUTILISATION.md
 schema.sql
+migration-allees.sql
 _dev
 _test.html
 .DS_Store

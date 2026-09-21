@@ -14,7 +14,13 @@
 
 html { -webkit-text-size-adjust: 100%; }
 
+/* La page ne défile jamais : seul l'écran du milieu (.screen) défile. Rien ne
+   « flotte » quand on tire une liste au bout de sa course. */
+html, body { height: 100%; overflow: hidden; }
+
 body {
+  position: fixed;
+  inset: 0;
   margin: 0;
   font-family: var(--font);
   font-size: 16px;
@@ -28,10 +34,17 @@ h1, h2, p, ul { margin: 0; padding: 0; }
 ul { list-style: none; }
 button { font: inherit; color: inherit; }
 
+/* L'app occupe exactement la fenêtre VISIBLE (voir initViewport dans lib/ui.js) :
+   clavier ouvert, tout ce qui est en bas se retrouve posé sur le clavier. */
 #app {
+  position: fixed;
+  left: 0; right: 0;
+  top: var(--vv-top, 0px);
+  height: var(--vv-h, 100dvh);
   max-width: var(--col);
   margin: 0 auto;
-  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
 
 .ic { width: 24px; height: 24px; flex: none; }
@@ -43,7 +56,7 @@ button { font: inherit; color: inherit; }
 
 /* ------------------------------------------------------------ chargement */
 .loading-screen {
-  min-height: 100dvh;
+  flex: 1;
   display: grid;
   place-items: center;
 }
@@ -58,11 +71,13 @@ button { font: inherit; color: inherit; }
 
 /* ------------------------------------------------- écrans plein centre */
 .center-screen {
-  min-height: 100dvh;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
   gap: 10px;
   text-align: center;
   padding:
@@ -153,15 +168,21 @@ input:focus {
 
 /* ---------------------------------------------------------------- écran */
 .screen {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding:
     calc(12px + env(safe-area-inset-top))
     calc(16px + env(safe-area-inset-right))
-    calc(var(--tabbar-h) + 24px + env(safe-area-inset-bottom))
+    24px
     calc(16px + env(safe-area-inset-left));
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
+.screen > * { flex-shrink: 0; }
 .net-banner:not([hidden]) + .screen { padding-top: 12px; }
 
 .screen-head { padding: 8px 2px 4px; }
@@ -177,6 +198,9 @@ input:focus {
   gap: 8px;
 }
 .inline { display: flex; gap: 8px; align-items: center; }
+.inline.top { align-items: flex-start; }
+.grow { flex: 1; min-width: 0; }
+.center { text-align: center; }
 .inline > input, .inline > .code { flex: 1; }
 .help { font-size: 13px; color: var(--text-muted); }
 .muted { color: var(--text-muted); font-size: 14px; }
@@ -209,7 +233,7 @@ input:focus {
 
 .empty {
   flex: 1;
-  min-height: 50dvh;
+  min-height: 260px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -266,6 +290,14 @@ input:focus {
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
+.list-row { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.list-row.dragging {
+  position: relative;
+  z-index: 3;
+  border-color: var(--focus-ring);
+  box-shadow: 0 8px 24px var(--scrim);
+  transition: none;
+}
 .list-open {
   flex: 1;
   min-width: 0;
@@ -308,10 +340,44 @@ input:focus {
   white-space: nowrap;
 }
 
-/* La boîte d'ajout est fixe : la liste doit pouvoir défiler au-dessus. */
-.items { display: flex; flex-direction: column; gap: 6px; padding-bottom: 130px; }
+.items { display: flex; flex-direction: column; gap: 14px; }
+.aisle { display: flex; flex-direction: column; gap: 6px; }
+.aisle-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
 
+/* Un article = une poubelle (dessous, à droite) + la ligne (dessus) qui glisse. */
 .item {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  touch-action: pan-y;   /* le glissement horizontal est à nous */
+}
+.item-del {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 76px;
+  display: grid;
+  place-items: center;
+  color: var(--on-danger);
+  background: var(--danger);
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  visibility: hidden;
+}
+.item.open .item-del, .item.swiping .item-del { visibility: visible; }
+.item-front {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   min-height: 56px;
@@ -319,6 +385,7 @@ input:focus {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
+  transition: transform 0.18s ease-out;
 }
 .item-main {
   flex: 1;
@@ -333,7 +400,7 @@ input:focus {
   background: none;
   border: 0;
   cursor: pointer;
-  touch-action: manipulation;
+  touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
@@ -351,7 +418,7 @@ input:focus {
 .item.checked .case { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .item.checked .item-name { color: var(--text-disabled); text-decoration: line-through; }
 .item-qte { flex: none; padding: 0 12px; color: var(--text-disabled); font-weight: 600; }
-.item.flash { animation: flash 1.2s ease-out; }
+.item.flash .item-front { animation: flash 1.2s ease-out; }
 @keyframes flash {
   0%, 35% { background: var(--tag-bg); border-color: var(--focus-ring); }
 }
@@ -380,18 +447,18 @@ input:focus {
 .pas output { min-width: 22px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
 .item .pas { border-color: transparent; background: none; }
 
-/* Boîte d'ajout : fixée au-dessus de la barre d'onglets, collée au clavier */
+/* Boîte d'ajout : dans le dock, entre l'écran qui défile et la barre d'onglets.
+   Elle ne bouge jamais ; clavier ouvert, elle est posée dessus. */
+.dock { flex: none; }
+.dock:empty { display: none; }
 .ajout {
-  position: fixed;
-  left: 0; right: 0;
-  bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
-  z-index: 9;
   padding: 8px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   background: var(--bg);
   border-top: 1px solid var(--border);
-  will-change: transform;
 }
-.ajout-in { max-width: calc(var(--col) - 24px); margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
 .ligne { display: flex; gap: 8px; align-items: center; }
 .ligne input { flex: 1; }
 .ligne .pas button { height: 46px; }
@@ -437,17 +504,15 @@ input:focus {
 }
 .completion:first-child { border-top: 0; }
 .completion:active { background: var(--tag-bg); }
-.completion-new { justify-content: flex-start; color: var(--accent-text); font-weight: 600; }
-.completion-new .ic { width: 18px; height: 18px; }
-
-/* Clavier ouvert : la boîte se pose sur le clavier, la barre d'onglets se cache. */
+/* Clavier ouvert ou champ d'ajout actif : la barre d'onglets se cache. */
 body.clavier .tabbar { display: none; }
-body.clavier .ajout { bottom: 0; }
 
 /* -------------------------------------------------------------- feuilles */
 .scrim {
   position: fixed;
-  inset: 0;
+  left: 0; right: 0;
+  top: var(--vv-top, 0px);
+  height: var(--vv-h, 100dvh);
   z-index: 40;
   display: flex;
   align-items: flex-end;
@@ -461,7 +526,7 @@ body.clavier .ajout { bottom: 0; }
 .sheet {
   width: 100%;
   max-width: var(--col);
-  max-height: 90dvh;
+  max-height: 92%;
   overflow-y: auto;
   padding: 8px 16px calc(20px + env(safe-area-inset-bottom));
   display: flex;
@@ -494,26 +559,21 @@ body.clavier .ajout { bottom: 0; }
 .menu-item:active { background: var(--surface-2); }
 .menu-item .ic { width: 20px; height: 20px; color: var(--text-muted); }
 .menu-item.danger, .menu-item.danger .ic { color: var(--danger); }
+.menu-item[aria-pressed="true"] { border-color: var(--focus-ring); background: var(--tag-bg); }
+.menu-item .grow + .ic { color: var(--accent-text); }
+.aisle-choices { display: flex; flex-direction: column; gap: 6px; }
+.btn-danger .ic { width: 20px; height: 20px; }
 
-.emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
-.emoji-choice {
-  aspect-ratio: 1;
-  min-height: 44px;
-  font-size: 22px;
-  line-height: 1;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  touch-action: manipulation;
+.emoji-input {
+  width: 64px !important;
+  padding: 0 !important;
+  font-size: 26px !important;
+  text-align: center;
 }
-.emoji-choice[aria-pressed="true"] { background: var(--tag-bg); border: 2px solid var(--focus-ring); }
 
 /* ----------------------------------------------------- bandeau de réseau */
 .net-banner {
-  position: sticky;
-  top: 0;
-  z-index: 5;
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -529,9 +589,7 @@ body.clavier .ajout { bottom: 0; }
 
 /* ------------------------------------------------------- barre d'onglets */
 .tabbar {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  z-index: 10;
+  flex: none;
   display: flex;
   justify-content: center;
   padding:
@@ -576,7 +634,7 @@ body.clavier .ajout { bottom: 0; }
   --toast-bg: var(--noir);
   position: fixed;
   left: 50%;
-  bottom: calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom));
+  top: calc(var(--vv-top, 0px) + env(safe-area-inset-top) + 10px);
   z-index: 50;
   max-width: min(92vw, 420px);
   padding: 12px 16px;
@@ -586,7 +644,7 @@ body.clavier .ajout { bottom: 0; }
   border-left: 4px solid var(--accent);
   border-radius: var(--radius-sm);
   opacity: 0;
-  transform: translate(-50%, 12px);
+  transform: translate(-50%, -12px);
   transition: opacity 0.2s, transform 0.2s;
   pointer-events: none;
 }
@@ -600,6 +658,7 @@ body.clavier .ajout { bottom: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   .toast, .scrim, .sheet { transition: none; }
-  .item.flash { animation: none; }
+  .item.flash .item-front { animation: none; }
+  .item-front { transition: none; }
   .spinner { animation-duration: 2s; }
 }

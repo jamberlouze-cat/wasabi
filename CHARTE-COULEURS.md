@@ -82,6 +82,7 @@ Les composants n'utilisent **que** les jetons de rôle ci-dessous, jamais les je
 | `--tag-bg` | `--wasabi-100` | `--wasabi-950` |
 | `--tag-text` | `--wasabi-800` | `--wasabi-500` |
 | `--danger` | `--piment` | `--piment-sombre` |
+| `--on-danger` | `--papier` | `--noir` |
 | `--focus-ring` | `--wasabi-600` | `--wasabi-500` |
 | `--scrim` | Noir à 45 % (`rgba(14,15,12,0.45)`) | idem | 
 
@@ -91,7 +92,7 @@ Les composants n'utilisent **que** les jetons de rôle ci-dessous, jamais les je
 2. **Texte sur Wasabi = toujours `--on-accent` (Noir)**, jamais blanc.
 3. **Jamais de texte `--wasabi-500` sur fond clair** (illisible). Pour du texte vert, utiliser `--accent-text`, qui se résout correctement dans les deux modes.
 4. **Une seule action Wasabi par écran** : le bouton « Ajouter » de la boîte du bas sur l'épicerie, le « + » sur les recettes. Les actions secondaires sont en contour (`--border`) avec texte `--text`.
-5. **`--danger` est réservé aux actions destructives** (« Effacer les cochés », supprimer une liste ou une recette). Toujours accompagné d'une confirmation.
+5. **`--danger` est réservé aux actions destructives** (« Effacer les cochés », supprimer une liste ou une recette). Toujours accompagné d'une confirmation — sauf « Effacer les cochés » et la poubelle d'un article (révélée par glissement, qu'il faut toucher) : ça reste une liste d'épicerie (décision du 2026-09-21).
 6. **Accessibilité** : contraste minimal WCAG AA (4,5:1 pour le texte, 3:1 pour les éléments d'interface). Ne jamais transmettre une information uniquement par la couleur (ex. article coché = case remplie **et** texte barré).
 7. **Aucun hex en dur** dans les composants. Une nouvelle couleur s'ajoute d'abord à ce document et au fichier de jetons.
 

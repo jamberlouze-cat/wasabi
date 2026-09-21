@@ -2,7 +2,7 @@ import { supabase } from "./lib/supabase.js";
 import { isConfigured } from "./lib/config.js";
 import { T } from "./lib/textes.js";
 import { icon } from "./lib/icons.js";
-import { esc, toast, closeSheet, sheetIsOpen } from "./lib/ui.js";
+import { esc, toast, closeSheet, sheetIsOpen, initViewport } from "./lib/ui.js";
 import { renderEpicerie } from "./lib/epicerie.js";
 import {
   store, restoreCache, clearOfflineData, pull, flush, patch, applyRemote,
@@ -29,7 +29,9 @@ function frDate(d, opts) { return new Intl.DateTimeFormat("fr-CA", opts).format(
 const sameDay = (a, b) => a.toDateString() === b.toDateString();
 
 // ----------------------------------------------------------------- réseau ---
-// Bandeau discret en haut : hors ligne et/ou changements en attente.
+// Bandeau discret en haut, seulement hors ligne (avec les changements en
+// attente). En ligne, rien : un bandeau « Envoi… » à chaque coche décalait
+// l'écran. L'état détaillé reste dans Réglages > Synchronisation.
 function sinceText() {
   if (!store.syncedAt) return "";
   const d = new Date(store.syncedAt);
@@ -40,7 +42,7 @@ function sinceText() {
 }
 function bannerText() {
   const n = pendingCount();
-  if (!isOffline()) return n ? T.envoiEnCours(n) : "";
+  if (!isOffline()) return "";
   return `${T.horsLigne}${sinceText()}${n ? " · " + T.aEnvoyer(n) : ""}`;
 }
 function renderBanner() {
@@ -48,7 +50,7 @@ function renderBanner() {
   if (!el) return;
   const text = bannerText();
   el.hidden = !text;
-  el.innerHTML = text ? `${icon(isOffline() ? "nuageCoupe" : "nuageEnvoi")} <span>${esc(text)}</span>` : "";
+  el.innerHTML = text ? `${icon("nuageCoupe")} <span>${esc(text)}</span>` : "";
   const sync = document.getElementById("sync-state");
   if (sync) sync.textContent = syncStateText();
 }
@@ -103,6 +105,7 @@ function renderApp() {
   app.innerHTML = `
     <div class="net-banner" id="net-banner" hidden></div>
     <main class="screen" id="screen"></main>
+    <div class="dock" id="dock"></div>
     <nav class="tabbar" aria-label="Sections">
       ${TABS.map((t) => `
         <button class="tab" data-tab="${t.id}" aria-current="${t.id === ui.tab ? "page" : "false"}">
@@ -110,9 +113,6 @@ function renderApp() {
         </button>`).join("")}
     </nav>`;
   renderScreen();
-  // Ceinture et bretelles : repartir du haut (iOS peut conserver un décalage
-  // de défilement hérité de l'écran de chargement ou du clavier).
-  window.scrollTo(0, 0);
   renderBanner();
 }
 
@@ -120,10 +120,11 @@ function renderScreen() {
   const screen = document.getElementById("screen");
   if (!screen) return;
   // L'épicerie se met à jour par morceaux (le champ d'ajout garde le focus).
-  if (ui.tab === "epicerie") { renderEpicerie(screen); return; }
+  const dock = document.getElementById("dock");
+  if (ui.tab === "epicerie") { renderEpicerie(screen, dock); return; }
   // Ne pas reconstruire un écran où l'on est en train d'écrire.
   if (screen.contains(document.activeElement) && document.activeElement.matches("input, textarea")) return;
-  document.body.classList.remove("clavier");
+  dock.innerHTML = "";
   screen.innerHTML = { recettes: recettesHtml, reglages: reglagesHtml }[ui.tab]();
 }
 
@@ -402,7 +403,7 @@ document.addEventListener("click", (e) => {
     if (sheetIsOpen()) closeSheet();
     document.getElementById("screen").innerHTML = "";   // repartir d'un écran neuf
     renderScreen();
-    window.scrollTo(0, 0);
+    document.getElementById("screen").scrollTop = 0;
     return;
   }
 
@@ -450,4 +451,5 @@ window.addEventListener("offline", () => { store.offline = true; renderBanner();
 // retente régulièrement : l'événement « online » n'est pas fiable sur iOS.
 setInterval(() => { if (store.offline || pendingCount()) wakeUp(); }, 30000);
 
+initViewport();
 boot();

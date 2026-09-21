@@ -64,8 +64,6 @@ python3 _dev/serve.py
   faux Supabase en mémoire. `?scenario=auth` (écran de connexion),
   `?scenario=onboard` (sans foyer). Dans la console : `__fake.offline = true`
   simule une panne de réseau, `__fake.log` montre ce qui a été envoyé.
-- `/_clavier.html` — maquette jetable de la boîte d'ajout collée au clavier, à
-  essayer sur un vrai iPhone (publiée exprès; à supprimer après la phase 1).
 
 ## Structure des fichiers
 
@@ -85,7 +83,8 @@ lib/icons.js            icônes SVG en ligne
 lib/vendor/             supabase-js embarqué (démarrage sans réseau)
 manifest.webmanifest    métadonnées PWA (+ share_target pour Android)
 sw.js                   service worker (installable, coquille hors ligne)
-schema.sql              schéma complet, RLS, semis, Storage, temps réel
+schema.sql              schéma complet, RLS, semis, Storage, temps réel (nouvelle installation)
+migration-allees.sql    gabarit des 19 allées, à passer une fois sur une base déjà installée
 worker.js               waker Supabase, /_ping, habillage de l'aperçu, /api/ (phase 3)
 wrangler.jsonc          config Cloudflare Workers
 _headers                en-têtes HTTP
