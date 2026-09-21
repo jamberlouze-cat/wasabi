@@ -170,6 +170,7 @@ input:focus {
 .screen {
   flex: 1;
   min-height: 0;
+  overflow-x: hidden;   /* jamais de défilement de côté */
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
@@ -358,8 +359,9 @@ input:focus {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 -8px;
 }
+.list-head > .icon-btn:first-child { margin-left: -10px; }
+.list-head > .icon-btn:last-child { margin-right: -10px; }
 .list-head h1 {
   flex: 1;
   min-width: 0;
