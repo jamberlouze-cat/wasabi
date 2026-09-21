@@ -99,7 +99,8 @@ catalogue.sql           généré par `python3 _dev/catalogue_sql.py`, à passer
 worker.js               waker Supabase, /_ping, habillage de l'aperçu, /api/ (aperçu de lien, image)
 wrangler.jsonc          config Cloudflare Workers
 _headers                en-têtes HTTP
-_test.html, _dev/       banc d'essai, faux Supabase, serveur local, générateur d'icônes
+_test.html, _dev/       banc d'essai, faux Supabase, serveur local, générateur d'icônes,
+                        import-umami.py (migration, simulation par défaut)
 ```
 
 À chaque changement des fichiers de la coquille, monter le numéro de `CACHE`
