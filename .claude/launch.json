@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "wasabi",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["_dev/serve.py"],
+      "port": 4174
+    }
+  ]
+}

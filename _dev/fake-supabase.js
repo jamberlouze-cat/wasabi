@@ -1,0 +1,111 @@
+// Faux Supabase en mémoire pour le banc d'essai (_test.html) : fait tourner la
+// VRAIE app.js et le VRAI lib/store.js sans réseau ni compte. Dev seulement.
+//
+//   _test.html                    connecté, foyer de deux membres
+//   _test.html?scenario=auth      écran de connexion
+//   _test.html?scenario=onboard   connecté, sans foyer
+// Dans la console : __fake.offline = true simule une panne de réseau ;
+// __fake.db montre les tables ; __fake.log, les requêtes d'écriture reçues.
+
+const SCENARIO = new URLSearchParams(location.search).get("scenario");
+const now = () => new Date().toISOString();
+
+const db = {
+  households: [{ id: "hh1", name: "Notre foyer", join_code: "WSBI", created_at: now(), updated_at: now() }],
+  household_members: [
+    { id: "m1", household_id: "hh1", user_id: "u1", name: "Maxime", color: "bleuet", created_at: "2026-09-01T00:00:00Z" },
+    { id: "m2", household_id: "hh1", user_id: "u2", name: "Sarah", color: "aubergine", created_at: "2026-09-01T00:01:00Z" },
+  ],
+  aisles: [{ id: "a1", household_id: "hh1", key: "autre", name: "Autre", position: 999, deleted_at: null, created_at: now() }],
+  household_items: [], grocery_lists: [], list_items: [],
+  recipe_categories: [], tags: [], recipes: [], recipe_files: [], recipe_tags: [],
+};
+if (SCENARIO === "onboard") db.household_members = db.household_members.filter((m) => m.user_id !== "u1");
+
+const state = { offline: false, db, log: [] };
+const NETWORK_ERROR = { data: null, error: { message: "TypeError: Failed to fetch" }, status: 0 };
+
+class Query {
+  constructor(table) { this.table = table; this.filters = []; this.op = "select"; }
+  select(cols = "*") { this.cols = cols; return this; }
+  eq(k, v) { this.filters.push((r) => r[k] === v); return this; }
+  is(k, v) { this.filters.push((r) => (r[k] ?? null) === v); return this; }
+  in(k, vs) { this.filters.push((r) => vs.includes(r[k])); return this; }
+  order(k) { this.orderBy = k; return this; }
+  limit() { return this; }
+  maybeSingle() { this.single = true; return this; }
+  upsert(row) { this.op = "upsert"; this.values = row; return this; }
+  update(values) { this.op = "update"; this.values = values; return this; }
+
+  run() {
+    if (state.offline) return NETWORK_ERROR;
+    const rows = (db[this.table] ||= []);
+    if (this.op === "upsert") {
+      state.log.push({ op: "upsert", table: this.table, values: this.values });
+      const i = rows.findIndex((r) => r.id === this.values.id);
+      const row = { deleted_at: null, ...(i >= 0 ? rows[i] : {}), ...this.values, updated_at: now() };
+      if (i >= 0) rows[i] = row; else rows.push(row);
+      return { data: null, error: null, status: 201 };
+    }
+    if (this.op === "update") {
+      state.log.push({ op: "update", table: this.table, values: this.values });
+      rows.filter((r) => this.filters.every((f) => f(r)))
+        .forEach((r) => Object.assign(r, this.values, { updated_at: now() }));
+      return { data: null, error: null, status: 204 };
+    }
+    let out = rows.filter((r) => this.filters.every((f) => f(r))).map((r) => ({ ...r }));
+    if (this.orderBy) out.sort((a, b) => String(a[this.orderBy]).localeCompare(String(b[this.orderBy])));
+    if (this.cols?.includes("households(*)")) {
+      out = out.map((r) => ({ ...r, households: { ...db.households.find((h) => h.id === r.household_id) } }));
+    }
+    return { data: this.single ? (out[0] || null) : out, error: null, status: 200 };
+  }
+  then(resolve, reject) {
+    return new Promise((r) => setTimeout(() => r(this.run()), 60)).then(resolve, reject);
+  }
+}
+
+let session = SCENARIO === "auth" ? null : { user: { id: "u1", email: "maxime@exemple.com" } };
+const authListeners = [];
+const fire = (event) => setTimeout(() => authListeners.forEach((cb) => cb(event, session)), 0);
+
+const auth = {
+  async getSession() { return { data: { session }, error: null }; },
+  onAuthStateChange(cb) { authListeners.push(cb); return { data: { subscription: { unsubscribe() {} } } }; },
+  async signInWithPassword({ email }) {
+    if (state.offline) return { data: {}, error: { message: "Failed to fetch" } };
+    session = { user: { id: "u1", email } };
+    fire("SIGNED_IN");
+    return { data: { session }, error: null };
+  },
+  async signUp(creds) { return this.signInWithPassword(creds); },
+  async signOut() { session = null; fire("SIGNED_OUT"); return { error: null }; },
+};
+
+const rpcs = {
+  create_household({ p_household_name, p_member_name, p_color }) {
+    const id = crypto.randomUUID();
+    db.households.push({ id, name: p_household_name, join_code: "NEUF", created_at: now() });
+    db.household_members.push({ id: crypto.randomUUID(), household_id: id, user_id: session.user.id, name: p_member_name, color: p_color, created_at: now() });
+    return { data: id, error: null };
+  },
+  join_household({ p_code, p_member_name, p_color }) {
+    const hh = db.households.find((h) => h.join_code === p_code);
+    if (!hh) return { data: null, error: { message: "household not found" } };
+    db.household_members.push({ id: crypto.randomUUID(), household_id: hh.id, user_id: session.user.id, name: p_member_name, color: p_color, created_at: now() });
+    return { data: hh.id, error: null };
+  },
+};
+
+export const fake = {
+  auth,
+  from: (table) => new Query(table),
+  async rpc(name, args) { return state.offline ? NETWORK_ERROR : rpcs[name](args); },
+  channel() {
+    const ch = { state: "joined", on() { return ch; }, subscribe(cb) { setTimeout(() => cb?.("SUBSCRIBED"), 0); return ch; } };
+    return ch;
+  },
+  removeChannel() {},
+};
+
+globalThis.__fake = state;

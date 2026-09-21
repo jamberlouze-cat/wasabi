@@ -1,0 +1,323 @@
+/* Wasabi — styles de l'app.
+   Couleurs : uniquement les jetons de rôle de tokens.css (CHARTE-COULEURS.md).
+   Aucun hex ici. Tout doit fonctionner en mode clair et en mode sombre. */
+
+:root {
+  --radius: 14px;
+  --radius-sm: 10px;
+  --tabbar-h: 58px;
+  --col: 560px;   /* à l'ordinateur : l'interface mobile centrée dans une colonne */
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+h1, h2, p, ul { margin: 0; padding: 0; }
+ul { list-style: none; }
+button { font: inherit; color: inherit; }
+
+#app {
+  max-width: var(--col);
+  margin: 0 auto;
+  min-height: 100dvh;
+}
+
+.ic { width: 24px; height: 24px; flex: none; }
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------ chargement */
+.loading-screen {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+}
+.spinner {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ------------------------------------------------- écrans plein centre */
+.center-screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding:
+    calc(24px + env(safe-area-inset-top))
+    calc(24px + env(safe-area-inset-right))
+    calc(24px + env(safe-area-inset-bottom))
+    calc(24px + env(safe-area-inset-left));
+}
+.center-screen h1 { font-size: 28px; letter-spacing: -0.02em; }
+.center-screen > p { color: var(--text-muted); max-width: 320px; }
+.center-screen > .btn { max-width: 320px; margin-top: 12px; }
+.mark { width: 84px; height: 84px; border-radius: 20px; margin-bottom: 6px; }
+
+.form {
+  width: 100%;
+  max-width: 320px;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field.spaced { margin-top: 14px; }
+
+/* ---------------------------------------------------------------- champs */
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+input[type="text"], input[type="email"], input[type="password"] {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 16px;   /* sous 16 px, Safari zoome sur le champ */
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  appearance: none;
+}
+input::placeholder { color: var(--text-muted); opacity: 1; }
+input:focus {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 0;
+  border-color: transparent;
+}
+.code-input {
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 0.3em;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------- boutons */
+/* Par défaut : contour neutre. Une seule action Wasabi (.btn-primary) par écran. */
+.btn {
+  min-height: 48px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+.btn:active { background: var(--surface-2); }
+.btn:disabled { color: var(--text-disabled); cursor: default; }
+.btn-block { width: 100%; }
+.btn-icon { width: 48px; padding: 0; flex: none; }
+.btn-primary {
+  color: var(--on-accent);
+  background: var(--accent);
+  border-color: transparent;
+}
+.btn-primary:active { background: var(--accent-hover); }
+.btn-primary:disabled { color: var(--on-accent); opacity: 0.6; }
+.btn-danger { color: var(--danger); }
+
+/* ---------------------------------------------------------------- écran */
+.screen {
+  padding:
+    calc(12px + env(safe-area-inset-top))
+    calc(16px + env(safe-area-inset-right))
+    calc(var(--tabbar-h) + 24px + env(safe-area-inset-bottom))
+    calc(16px + env(safe-area-inset-left));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.net-banner:not([hidden]) + .screen { padding-top: 12px; }
+
+.screen-head { padding: 8px 2px 4px; }
+.screen-head h1 { font-size: 30px; letter-spacing: -0.02em; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.inline { display: flex; gap: 8px; align-items: center; }
+.inline > input, .inline > .code { flex: 1; }
+.help { font-size: 13px; color: var(--text-muted); }
+.muted { color: var(--text-muted); font-size: 14px; }
+.sync { color: var(--text); }
+
+.code {
+  min-height: 48px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--accent-text);
+  background: var(--tag-bg);
+  border-radius: var(--radius-sm);
+  user-select: all;
+}
+
+.rows { display: flex; flex-direction: column; }
+.row {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+}
+.row:first-child { border-top: 0; }
+.row-main { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+
+.empty {
+  flex: 1;
+  min-height: 50dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  color: var(--text-muted);
+  padding: 0 24px;
+}
+.empty-icon {
+  width: 72px; height: 72px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-2);
+}
+.empty-icon .ic { width: 32px; height: 32px; }
+
+/* ----------------------------------------------------- bandeau de réseau */
+.net-banner {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: calc(6px + env(safe-area-inset-top)) 16px 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+.net-banner[hidden] { display: none; }
+.net-banner .ic { width: 16px; height: 16px; }
+
+/* ------------------------------------------------------- barre d'onglets */
+.tabbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  padding:
+    0 env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.tab {
+  flex: 1;
+  max-width: calc(var(--col) / 3);
+  height: var(--tabbar-h);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.tab[aria-current="page"] { color: var(--text); }
+.tab[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 28px; height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--accent);
+}
+
+/* ---------------------------------------------------------------- toasts */
+/* Charte : fond Noir en clair, surface-2 en sombre ; texte Off-white ;
+   liseré gauche selon le type. */
+.toast {
+  --toast-bg: var(--noir);
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom));
+  z-index: 50;
+  max-width: min(92vw, 420px);
+  padding: 12px 16px;
+  font-size: 15px;
+  color: var(--off-white);
+  background: var(--toast-bg);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  transform: translate(-50%, 12px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast[data-type="alerte"] { border-left-color: var(--curcuma); }
+.toast[data-type="erreur"] { border-left-color: var(--danger); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .toast { --toast-bg: var(--surface-2); }
+}
+:root[data-theme="dark"] .toast { --toast-bg: var(--surface-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .toast { transition: none; }
+  .spinner { animation-duration: 2s; }
+}

@@ -1,0 +1,98 @@
+/* Jetons de couleur — App recettes et épicerie
+   Référence : CHARTE-COULEURS.md
+   Les composants utilisent uniquement les jetons de rôle (section « Rôles »). */
+
+:root {
+  /* Marque — Wasabi */
+  --wasabi-100: #F0FBC9;
+  --wasabi-300: #DDF78A;
+  --wasabi-500: #C5F135;
+  --wasabi-600: #9CC41A;
+  --wasabi-800: #4B6300;
+  --wasabi-950: #2A3310;
+
+  /* Neutres */
+  --noir: #0E0F0C;
+  --charbon: #1A1C17;
+  --graphite: #2A2D25;
+  --gris-600: #5C6055;
+  --gris-400: #9A9E90;
+  --gris-200: #DEDCD0;
+  --off-white: #F6F4EC;
+  --papier: #FCFBF7;
+
+  /* Sémantiques */
+  --piment: #E5484D;
+  --piment-sombre: #FF6B6B;
+  --curcuma: #F2B33D;
+  --bleuet: #5B8DEF;
+  --aubergine: #7A4FC2;
+
+  /* Allées d'épicerie (pastilles seulement) */
+  --allee-fruits-legumes: #3FA66A;
+  --allee-boulangerie: #D9A35B;
+  --allee-laitiers: #7FB6E8;
+  --allee-viandes-poissons: #E0606B;
+  --allee-garde-manger: #E08A3C;
+  --allee-surgeles: #6FD3D6;
+  --allee-boissons: #8C7BE8;
+  --allee-maison: #9A9E90;
+
+  /* Rôles — mode clair (défaut) */
+  --bg: var(--off-white);
+  --surface: var(--papier);
+  --surface-2: #EFEDE3;
+  --border: var(--gris-200);
+  --text: var(--noir);
+  --text-muted: var(--gris-600);
+  --text-disabled: var(--gris-400);
+  --accent: var(--wasabi-500);
+  --accent-hover: var(--wasabi-300);
+  --on-accent: var(--noir);
+  --accent-text: var(--wasabi-800);
+  --tag-bg: var(--wasabi-100);
+  --tag-text: var(--wasabi-800);
+  --danger: var(--piment);
+  --focus-ring: var(--wasabi-600);
+
+  color-scheme: light dark;
+}
+
+/* Rôles — mode sombre (préférence système, sauf si le clair est forcé) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: var(--noir);
+    --surface: var(--charbon);
+    --surface-2: var(--graphite);
+    --border: var(--graphite);
+    --text: var(--off-white);
+    --text-muted: var(--gris-400);
+    --text-disabled: var(--gris-600);
+    --accent-text: var(--wasabi-500);
+    --tag-bg: var(--wasabi-950);
+    --tag-text: var(--wasabi-500);
+    --danger: var(--piment-sombre);
+    --focus-ring: var(--wasabi-500);
+  }
+}
+
+/* Rôles — mode sombre forcé */
+:root[data-theme="dark"] {
+  --bg: var(--noir);
+  --surface: var(--charbon);
+  --surface-2: var(--graphite);
+  --border: var(--graphite);
+  --text: var(--off-white);
+  --text-muted: var(--gris-400);
+  --text-disabled: var(--gris-600);
+  --accent-text: var(--wasabi-500);
+  --tag-bg: var(--wasabi-950);
+  --tag-text: var(--wasabi-500);
+  --danger: var(--piment-sombre);
+  --focus-ring: var(--wasabi-500);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}

@@ -1,0 +1,32 @@
+// Configuration Cloudflare Workers — le site est 100 % statique : Cloudflare
+// sert les fichiers de ce dossier. worker.js n'ajoute que la tâche planifiée
+// qui garde Supabase éveillé, l'adresse de vérification /_ping et, plus tard,
+// l'aperçu de lien (/api/).
+// Les fichiers listés dans .assetsignore ne sont jamais publiés.
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "wasabi",
+  "main": "worker.js",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+    // Par défaut Cloudflare sert un fichier existant SANS passer par worker.js.
+    // Ces adresses-ci doivent y passer : sur l'aperçu dev-…, le Worker remplace
+    // le manifeste (nom « Wasabi DEV ») et les icônes (couleurs inversées).
+    "run_worker_first": [
+      "/_ping",
+      "/api/*",
+      "/manifest.webmanifest",
+      "/assets/icon-180.png",
+      "/assets/icon-192.png",
+      "/assets/icon-512.png"
+    ]
+  },
+  "triggers": {
+    // Quatre fois par jour (Supabase veut « quelques requêtes chaque jour »).
+    "crons": ["0 2,8,14,20 * * *"]
+  }
+}

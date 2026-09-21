@@ -1,0 +1,19 @@
+# Fichiers présents dans le dépôt mais jamais publiés sur le site.
+.git
+.gitignore
+.claude
+.github
+.assetsignore
+wrangler.jsonc
+worker.js
+README.md
+CLAUDE.md
+FEUILLE_DE_ROUTE.md
+CHARTE-COULEURS.md
+REUTILISATION.md
+schema.sql
+_dev
+_test.html
+.DS_Store
+.wrangler/
+node_modules/

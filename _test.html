@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>Wasabi — banc d'essai</title>
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div id="app"><div class="loading-screen"><div class="spinner"></div></div></div>
+  <!-- La VRAIE app.js sur un faux Supabase en mémoire (voir _dev/fake-supabase.js).
+       Jamais publié (.assetsignore). -->
+  <script type="module">
+    import { fake } from "./_dev/fake-supabase.js";
+    globalThis.__WASABI_FAKE_SUPABASE__ = fake;
+    await import("./app.js");
+  </script>
+</body>
+</html>
