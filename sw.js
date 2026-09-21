@@ -6,7 +6,8 @@
 //   aucun CDN à mettre en cache.
 // - Les données Supabase ne passent jamais par ici : c'est lib/store.js qui en
 //   garde une copie sur l'appareil.
-const CACHE = "wasabi-v10";
+const CACHE = "wasabi-v11";
+const MEDIA = "wasabi-media-v1";   // images et PDF des recettes (lib/media.js) : à garder
 const NETWORK_TIMEOUT_MS = 3000;
 const SHELL = [
   "./",
@@ -23,7 +24,9 @@ const SHELL = [
   "./lib/noms.js",
   "./lib/epicerie.js",
   "./lib/glisser.js",
-  "./lib/reglages-epicerie.js",
+  "./lib/reglages-vues.js",
+  "./lib/recettes.js",
+  "./lib/media.js",
   "./lib/vendor/supabase-js.js",
   "./manifest.webmanifest",
   "./assets/icon-180.png",
@@ -37,7 +40,7 @@ self.addEventListener("install", (e) => {
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE && k !== MEDIA).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });

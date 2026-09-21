@@ -4,9 +4,11 @@ import { T } from "./lib/textes.js";
 import { icon } from "./lib/icons.js";
 import { esc, toast, closeSheet, sheetIsOpen, initViewport } from "./lib/ui.js";
 import { renderEpicerie, showLists } from "./lib/epicerie.js";
+import { renderRecettes, showRecettesGrid, recetteFromShare } from "./lib/recettes.js";
+import { flushUploads } from "./lib/media.js";
 import {
   configureReglages, reglagesNavHtml, reglagesSubview, renderReglagesSubview, closeReglagesSubview,
-} from "./lib/reglages-epicerie.js";
+} from "./lib/reglages-vues.js";
 import {
   store, restoreCache, clearOfflineData, pull, flush, patch, applyRemote,
   pendingCount, isOffline, on as onStore,
@@ -76,8 +78,9 @@ function scheduleReload() {
 // au besoin, et on recharge les données à chaque reconnexion : ce qui s'est
 // passé pendant la coupure n'a jamais été reçu.
 // Tables de données : la ligne reçue est appliquée telle quelle (pas de
-// rechargement complet à chaque coche). Recettes : à ajouter en phase 3.
-const REALTIME_TABLES = ["grocery_lists", "list_items", "household_items", "aisles"];
+// rechargement complet à chaque coche).
+const REALTIME_TABLES = ["grocery_lists", "list_items", "household_items", "aisles",
+  "recipes", "recipe_files", "recipe_tags", "tags", "recipe_categories"];
 let renderTimer = null;
 function onRemoteRow(table, payload) {
   applyRemote(table, payload.new);
@@ -125,22 +128,13 @@ function renderScreen() {
   // L'épicerie se met à jour par morceaux (le champ d'ajout garde le focus).
   const dock = document.getElementById("dock");
   if (ui.tab === "epicerie") { renderEpicerie(screen, dock); return; }
+  if (ui.tab === "recettes") { dock.innerHTML = ""; renderRecettes(screen); return; }
   if (ui.tab === "reglages" && reglagesSubview()) { dock.innerHTML = ""; renderReglagesSubview(screen); return; }
   // Ne pas reconstruire un écran où l'on est en train d'écrire.
   if (screen.contains(document.activeElement) && document.activeElement.matches("input, textarea")) return;
   dock.innerHTML = "";
-  screen.innerHTML = { recettes: recettesHtml, reglages: reglagesHtml }[ui.tab]();
+  screen.innerHTML = reglagesHtml();
 }
-
-function placeholderHtml(titre, icone, texte) {
-  return `
-    <header class="screen-head"><h1>${titre}</h1></header>
-    <div class="empty">
-      <div class="empty-icon">${icon(icone)}</div>
-      <p>${texte}</p>
-    </div>`;
-}
-const recettesHtml = () => placeholderHtml(T.onglets.recettes, "livre", T.recettesVide);
 
 // --------------------------------------------------------------- réglages ---
 function syncStateText() {
@@ -355,6 +349,13 @@ async function boot() {
   // Empêche iOS de restaurer un ancien décalage de défilement au lancement.
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
+  // Android : lien reçu par le menu Partager (share_target) → formulaire prérempli.
+  const partage = new URLSearchParams(location.search);
+  if ((partage.has("url") || partage.has("text")) && recetteFromShare(partage)) {
+    ui.tab = "recettes";
+    history.replaceState(null, "", location.pathname);
+  }
+
   const fromCache = restoreCache();
   if (fromCache) { store.offline = !navigator.onLine; renderApp(); }
   else app.innerHTML = `<div class="loading-screen"><div class="spinner"></div></div>`;
@@ -377,6 +378,7 @@ async function boot() {
   if (!hasMember) { clearOfflineData(); store.user = session.user; renderOnboarding(); return; }
 
   await flush();
+  flushUploads();
   const loaded = await pull();
   if (!loaded && !fromCache) toast(T.chargementImpossible, { type: "erreur", ms: 8000 });
   subscribeRealtime();
@@ -407,6 +409,10 @@ document.addEventListener("click", (e) => {
       document.activeElement?.blur();
       if (sheetIsOpen()) closeSheet();
       return showLists();
+    }
+    if (btn.dataset.tab === "recettes" && ui.tab === "recettes") {
+      if (sheetIsOpen()) closeSheet();
+      return showRecettesGrid();
     }
     if (btn.dataset.tab === "reglages") closeReglagesSubview();
     ui.tab = btn.dataset.tab;
@@ -449,6 +455,7 @@ function wakeUp() {
   wakePromise = (async () => {
     try {
       await flush();
+      flushUploads();
       if (await pull()) renderScreen();
       if (!channel || (channel.state !== "joined" && channel.state !== "joining")) subscribeRealtime();
     } finally {

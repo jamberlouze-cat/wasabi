@@ -10,7 +10,11 @@ foyer, partagés en temps réel et utilisables hors ligne. Remplace Umami.
 Documents de référence : `FEUILLE_DE_ROUTE.md` (portée et phases),
 `CHARTE-COULEURS.md` (couleurs), `REUTILISATION.md` (ce qui vient de Calico et Panache).
 
-**État : phase 1 (épicerie).** Listes avec emoji, articles, quantités, boîte
+**État : phase 3 (recettes).** Carnet en tuiles (lien, recette écrite, photo ou
+PDF), aperçu de lien par le Worker, images réduites sur le téléphone et gardées
+hors ligne, catégories et tags.
+
+**Épicerie (phases 1 et 2).** Listes avec emoji, articles, quantités, boîte
 d'ajout avec suggestions par fréquence et autocomplétion sur la mémoire du foyer,
 tout cocher / décocher / effacer les cochés, temps réel et hors ligne. Articles classés
 par allée (13 allées) puis par ordre alphabétique ; un catalogue québécois
@@ -76,7 +80,9 @@ lib/config.js           ← adresse et clé publique Supabase
 lib/supabase.js         client Supabase
 lib/store.js            couche hors ligne : copie locale + file de patchs par champ
 lib/epicerie.js         onglet Épicerie : listes, articles, boîte d'ajout collée au clavier
-lib/reglages-epicerie.js  Réglages > Allées et > Mes articles
+lib/recettes.js         onglet Recettes : grille, fiche, formulaire, visionneuse
+lib/media.js            images et PDF : compression, cache sur l'appareil, envoi différé
+lib/reglages-vues.js    Réglages > Allées, Mes articles, Catégories, Tags
 lib/glisser.js          glisser-déposer par appui long (listes, allées)
 lib/noms.js             noms normalisés + identifiants stables (pas de doublon à la synchro)
 lib/ui.js               échappement, toasts, feuilles du bas
@@ -89,7 +95,7 @@ schema.sql              schéma complet, RLS, semis, Storage, temps réel (nouve
 migration-phase2.sql    gabarit des 13 allées + note d'article, à passer une fois sur une base déjà installée
 catalogue.csv           catalogue d'articles (nom, synonymes séparés par « | », cle_allee) — à corriger ici
 catalogue.sql           généré par `python3 _dev/catalogue_sql.py`, à passer dans Supabase
-worker.js               waker Supabase, /_ping, habillage de l'aperçu, /api/ (phase 3)
+worker.js               waker Supabase, /_ping, habillage de l'aperçu, /api/ (aperçu de lien, image)
 wrangler.jsonc          config Cloudflare Workers
 _headers                en-têtes HTTP
 _test.html, _dev/       banc d'essai, faux Supabase, serveur local, générateur d'icônes

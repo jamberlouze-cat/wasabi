@@ -86,6 +86,7 @@ Les composants n'utilisent **que** les jetons de rôle ci-dessous, jamais les je
 | `--danger` | `--piment` | `--piment-sombre` |
 | `--on-danger` | `--papier` | `--noir` |
 | `--focus-ring` | `--wasabi-600` | `--wasabi-500` |
+| `--tile-shade` / `--tile-shade-0` | dégradé Noir 70 % → 0 % sous le nom d'une tuile | idem |
 | `--scrim` | Noir à 45 % (`rgba(14,15,12,0.45)`) | idem | 
 
 ## 4. Règles d'usage (obligatoires)

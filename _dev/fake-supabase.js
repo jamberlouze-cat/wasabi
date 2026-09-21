@@ -41,7 +41,14 @@ const db = {
     { id: "c3", name: "Yogourt", name_normalized: "yogourt", synonyms: ["Yaourt"], default_aisle_key: "laitiers_oeufs" },
     { id: "c4", name: "Café", name_normalized: "cafe", synonyms: [], default_aisle_key: "boissons" },
   ],
-  recipe_categories: [], tags: [], recipes: [], recipe_files: [], recipe_tags: [],
+  recipe_categories: ["Soupe", "Plat principal", "Dessert"].map((name, i) => ({ id: "rcat" + i, household_id: "hh1", name, position: i + 1, deleted_at: null, created_at: now() })),
+  tags: [{ id: "t1", household_id: "hh1", name: "Rapide", deleted_at: null, created_at: now() }, { id: "t2", household_id: "hh1", name: "Végé", deleted_at: null, created_at: now() }],
+  recipes: [
+    { id: "r1", household_id: "hh1", type: "url", title: "Pâté chinois classique", url: "https://www.ricardocuisine.com/recettes/5541", site_name: "Ricardo", category_id: "rcat1", cover_path: null, notes: "Doubler le maïs.", deleted_at: null, created_at: "2026-09-10T10:00:00Z" },
+    { id: "r2", household_id: "hh1", type: "manual", title: "Soupe aux pois de grand-maman", category_id: "rcat0", cover_path: null, ingredients_text: "2 tasses de pois jaunes\n1 os de jambon\n1 oignon", steps_text: "Faire tremper les pois toute la nuit.\nMijoter 3 heures.", notes: null, deleted_at: null, created_at: "2026-09-11T10:00:00Z" },
+  ],
+  recipe_files: [],
+  recipe_tags: [{ id: "rt1", household_id: "hh1", recipe_id: "r1", tag_id: "t1", deleted_at: null, created_at: now() }],
 };
 if (SCENARIO === "onboard") db.household_members = db.household_members.filter((m) => m.user_id !== "u1");
 
@@ -120,8 +127,28 @@ const rpcs = {
   },
 };
 
+// Storage en mémoire (les fichiers vivent le temps de la page).
+const fichiers = new Map();
+const storage = {
+  from: () => ({
+    async upload(path, blob) {
+      if (state.offline) return { data: null, error: { message: "Failed to fetch", status: 0 } };
+      fichiers.set(path, blob);
+      state.log.push({ op: "upload", table: "storage", values: { path, octets: blob.size, type: blob.type } });
+      return { data: { path }, error: null };
+    },
+    async download(path) {
+      return fichiers.has(path) ? { data: fichiers.get(path), error: null } : { data: null, error: { message: "not found" } };
+    },
+    async createSignedUrl(path) {
+      return fichiers.has(path) ? { data: { signedUrl: URL.createObjectURL(fichiers.get(path)) }, error: null } : { data: null, error: { message: "not found" } };
+    },
+  }),
+};
+
 export const fake = {
   auth,
+  storage,
   from: (table) => new Query(table),
   async rpc(name, args) { return state.offline ? NETWORK_ERROR : rpcs[name](args); },
   channel() {
