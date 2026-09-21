@@ -197,8 +197,16 @@ input:focus {
 }
 .net-banner:not([hidden]) + .screen { padding-top: 12px; }
 
-.screen-head { padding: 8px 2px 4px; }
-.screen-head h1 { font-size: 30px; letter-spacing: -0.02em; }
+.screen-head {
+  min-height: 52px;
+  padding: 4px 2px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.screen-head h1 { font-size: 30px; line-height: 1.2; letter-spacing: -0.02em; }
+.screen-head .btn-icon { width: 44px; min-height: 44px; }
 
 .card {
   background: var(--surface);
@@ -541,7 +549,6 @@ input:focus {
 body.clavier .tabbar { display: none; }
 
 /* ------------------------------------------------------------- recettes */
-.screen-head.with-action { display: flex; align-items: center; justify-content: space-between; }
 .btn.round { border-radius: 50%; }
 .btn-small { min-height: 38px; padding: 0 14px; font-size: 15px; align-self: flex-start; border-radius: 19px; }
 .btn-small .ic { width: 16px; height: 16px; }
@@ -550,7 +557,7 @@ body.clavier .tabbar { display: none; }
 #rc-filters:empty { display: none; }
 .puce.on { color: var(--on-accent); background: var(--accent); }
 
-.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .tile {
   position: relative;
   aspect-ratio: 1;
@@ -578,8 +585,8 @@ body.clavier .tabbar { display: none; }
 .tile-name {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  padding: 28px 10px 9px;
-  font-size: 14px;
+  padding: 22px 7px 7px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1.25;
   color: var(--off-white);
@@ -593,11 +600,11 @@ body.clavier .tabbar { display: none; }
 /* Tuile sans photo : fond surface-2, nom du site ou initiale en text-muted. */
 .tile.sans-image .tile-fallback {
   position: absolute;
-  inset: 0 0 34px;
+  inset: 0 0 30px;
   display: grid;
   place-items: center;
-  padding: 0 12px;
-  font-size: 15px;
+  padding: 0 8px;
+  font-size: 13px;
   font-weight: 600;
   text-align: center;
   overflow-wrap: anywhere;
@@ -606,8 +613,8 @@ body.clavier .tabbar { display: none; }
 .tile.sans-image .tile-name { color: var(--text); background: none; }
 .tile-info {
   position: absolute;
-  top: 6px; right: 6px;
-  width: 40px; height: 40px;
+  top: 2px; right: 2px;
+  width: 36px; height: 36px;
   display: grid;
   place-items: center;
   color: var(--off-white);
@@ -616,7 +623,7 @@ body.clavier .tabbar { display: none; }
   cursor: pointer;
   touch-action: manipulation;
 }
-.tile-info .ic { width: 28px; height: 28px; padding: 3px; border-radius: 50%; background: var(--scrim); }
+.tile-info .ic { width: 24px; height: 24px; padding: 2px; border-radius: 50%; background: var(--scrim); }
 .tile.sans-image .tile-info { color: var(--text-muted); }
 .tile.sans-image .tile-info .ic { background: none; }
 
