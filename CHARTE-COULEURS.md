@@ -49,6 +49,8 @@
 
 ### 2.4 Allées d'épicerie
 
+> **Décision du 2026-09-22 : les pastilles d'allée ne sont pas affichées.** Avec 13 allées pour 8 couleurs, elles ne servaient plus de repère ; les en-têtes d'allée sont en texte seul. Les jetons restent disponibles (tags de recettes).
+
 Utilisées uniquement en **pastilles de 8 à 12 px** à côté du nom de l'allée, jamais en aplat ni en fond. Peuvent aussi servir aux tags de recettes.
 
 | Jeton | Hex | Allée |
@@ -102,7 +104,7 @@ Les composants n'utilisent **que** les jetons de rôle ci-dessous, jamais les je
 - **Ligne d'article** : fond `--surface`, bordure `--border`, texte `--text`.
 - **Case non cochée** : bordure 1,5 px `--text-disabled`, fond transparent.
 - **Case cochée** : fond `--accent`, crochet `--on-accent`. Texte de l'article barré en `--text-disabled`.
-- **En-tête d'allée** : pastille de la couleur d'allée + libellé en majuscules `--text-muted`.
+- **En-tête d'allée** : libellé en majuscules `--text-muted` (sans pastille, voir § 2.4).
 - **Boîte d'ajout (bas de l'écran)** : champ fond `--surface`, bordure `--border`, placeholder `--text-muted`; au focus, anneau `--focus-ring`. Bouton « Ajouter » : fond `--accent`, texte `--on-accent`.
 - **Suggestions d'aliments fréquents** : puces fond `--surface-2`, texte `--text`; pressé → fond `--tag-bg`, texte `--tag-text`.
 - **Tout cocher / Tout décocher** : boutons en contour neutre. **Effacer les cochés** : texte `--danger`.

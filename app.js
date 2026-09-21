@@ -5,6 +5,9 @@ import { icon } from "./lib/icons.js";
 import { esc, toast, closeSheet, sheetIsOpen, initViewport } from "./lib/ui.js";
 import { renderEpicerie, showLists } from "./lib/epicerie.js";
 import {
+  configureReglages, reglagesNavHtml, reglagesSubview, renderReglagesSubview, closeReglagesSubview,
+} from "./lib/reglages-epicerie.js";
+import {
   store, restoreCache, clearOfflineData, pull, flush, patch, applyRemote,
   pendingCount, isOffline, on as onStore,
 } from "./lib/store.js";
@@ -122,6 +125,7 @@ function renderScreen() {
   // L'épicerie se met à jour par morceaux (le champ d'ajout garde le focus).
   const dock = document.getElementById("dock");
   if (ui.tab === "epicerie") { renderEpicerie(screen, dock); return; }
+  if (ui.tab === "reglages" && reglagesSubview()) { dock.innerHTML = ""; renderReglagesSubview(screen); return; }
   // Ne pas reconstruire un écran où l'on est en train d'écrire.
   if (screen.contains(document.activeElement) && document.activeElement.matches("input, textarea")) return;
   dock.innerHTML = "";
@@ -155,6 +159,8 @@ function reglagesHtml() {
     </li>`).join("");
   return `
     <header class="screen-head"><h1>${T.onglets.reglages}</h1></header>
+
+    ${reglagesNavHtml()}
 
     <section class="card">
       <label class="label" for="set-hh-name">${T.nomDuFoyer}</label>
@@ -396,11 +402,13 @@ document.addEventListener("click", (e) => {
   if (!btn) return;
 
   if (btn.dataset.tab) {
+    // Onglet touché alors qu'on y est déjà : retour à son écran principal.
     if (btn.dataset.tab === "epicerie" && ui.tab === "epicerie") {
       document.activeElement?.blur();
       if (sheetIsOpen()) closeSheet();
       return showLists();
     }
+    if (btn.dataset.tab === "reglages") closeReglagesSubview();
     ui.tab = btn.dataset.tab;
     try { localStorage.setItem(TAB_KEY, ui.tab); } catch { /* rien */ }
     document.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-current", b.dataset.tab === ui.tab ? "page" : "false"));
@@ -456,5 +464,17 @@ window.addEventListener("offline", () => { store.offline = true; renderBanner();
 // retente régulièrement : l'événement « online » n'est pas fiable sur iOS.
 setInterval(() => { if (store.offline || pendingCount()) wakeUp(); }, 30000);
 
+let vueReglages = null;
+configureReglages({
+  onChange: () => {
+    document.activeElement?.blur();
+    const screen = document.getElementById("screen");
+    if (screen && !reglagesSubview()) screen.innerHTML = "";   // retour à l'écran principal
+    const top = screen?.scrollTop || 0;
+    renderScreen();
+    if (screen) screen.scrollTop = vueReglages === reglagesSubview() ? top : 0;
+    vueReglages = reglagesSubview();
+  },
+});
 initViewport();
 boot();

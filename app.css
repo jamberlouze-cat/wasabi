@@ -230,6 +230,24 @@ input:focus {
   user-select: all;
 }
 
+.nav-card { padding: 0 14px; gap: 0; }
+.nav-row, .row-btn {
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.nav-row { font-weight: 600; }
+.nav-row + .nav-row { border-top: 1px solid var(--border); }
+.nav-row .ic { width: 18px; height: 18px; color: var(--text-muted); }
+.card.rows { padding: 0 14px; gap: 0; }
+.rows li + li .row-btn { border-top: 1px solid var(--border); }
 .rows { display: flex; flex-direction: column; }
 .row {
   min-height: 44px;
@@ -301,8 +319,9 @@ input:focus {
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
+.list-open.fixed { cursor: default; }
 .list-row { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-.list-row.dragging {
+.dragging {
   position: relative;
   z-index: 3;
   border-color: var(--focus-ring);
@@ -354,9 +373,6 @@ input:focus {
 .items { display: flex; flex-direction: column; gap: 14px; }
 .aisle { display: flex; flex-direction: column; gap: 6px; }
 .aisle-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   padding: 2px 4px 0;
   font-size: 12px;
   font-weight: 700;

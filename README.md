@@ -76,6 +76,8 @@ lib/config.js           ← adresse et clé publique Supabase
 lib/supabase.js         client Supabase
 lib/store.js            couche hors ligne : copie locale + file de patchs par champ
 lib/epicerie.js         onglet Épicerie : listes, articles, boîte d'ajout collée au clavier
+lib/reglages-epicerie.js  Réglages > Allées et > Mes articles
+lib/glisser.js          glisser-déposer par appui long (listes, allées)
 lib/noms.js             noms normalisés + identifiants stables (pas de doublon à la synchro)
 lib/ui.js               échappement, toasts, feuilles du bas
 lib/textes.js           toutes les chaînes de l'interface (français)
