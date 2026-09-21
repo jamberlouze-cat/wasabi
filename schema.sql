@@ -304,7 +304,7 @@ begin
     ('laitiers_oeufs',         'Produits laitiers',          70, 'laitiers'),
     ('boissons',               'Boissons',                   80, 'boissons'),
     ('surgeles',               'Surgelés',                   90, 'surgeles'),
-    ('maison_hygiene',         'Produits ménagers',         100, 'maison'),
+    ('maison_hygiene',         'Maison et hygiène',         100, 'maison'),
     ('bebe',                   'Bébé',                      110, 'maison'),
     ('animaux',                'Animaux',                   120, 'maison'),
     ('autre',                  'Autre',                     999, 'maison')
