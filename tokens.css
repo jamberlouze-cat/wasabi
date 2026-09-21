@@ -54,6 +54,7 @@
   --tag-text: var(--wasabi-800);
   --danger: var(--piment);
   --focus-ring: var(--wasabi-600);
+  --scrim: rgba(14, 15, 12, 0.45);   /* voile derrière une feuille (Noir translucide) */
 
   color-scheme: light dark;
 }

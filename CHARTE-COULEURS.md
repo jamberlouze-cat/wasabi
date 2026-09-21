@@ -83,6 +83,7 @@ Les composants n'utilisent **que** les jetons de rôle ci-dessous, jamais les je
 | `--tag-text` | `--wasabi-800` | `--wasabi-500` |
 | `--danger` | `--piment` | `--piment-sombre` |
 | `--focus-ring` | `--wasabi-600` | `--wasabi-500` |
+| `--scrim` | Noir à 45 % (`rgba(14,15,12,0.45)`) | idem | 
 
 ## 4. Règles d'usage (obligatoires)
 

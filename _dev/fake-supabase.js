@@ -17,7 +17,19 @@ const db = {
     { id: "m2", household_id: "hh1", user_id: "u2", name: "Sarah", color: "aubergine", created_at: "2026-09-01T00:01:00Z" },
   ],
   aisles: [{ id: "a1", household_id: "hh1", key: "autre", name: "Autre", position: 999, deleted_at: null, created_at: now() }],
-  household_items: [], grocery_lists: [], list_items: [],
+  household_items: ["Lait", "Pain", "Œufs", "Bananes", "Beurre", "Café", "Yogourt", "Tomates", "Fromage cheddar", "Oignons", "Pommes", "Riz"].map((name, i) => ({
+    id: "hi" + i, household_id: "hh1", name, name_normalized: name.toLowerCase().replace("œ", "oe").normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+    catalog_item_id: null, aisle_id: "a1", use_count: 20 - i, last_used_at: now(), deleted_at: null, created_at: now(),
+  })),
+  grocery_lists: [
+    { id: "l1", household_id: "hh1", name: "Épicerie", emoji: "🛒", position: 1, deleted_at: null, created_at: "2026-09-01T00:00:00Z" },
+    { id: "l2", household_id: "hh1", name: "Costco", emoji: "🏠", position: 2, deleted_at: null, created_at: "2026-09-02T00:00:00Z" },
+  ],
+  list_items: [
+    { id: "li1", household_id: "hh1", list_id: "l1", household_item_id: "hi0", name: "Lait", quantity: 2, checked: false, checked_at: null, deleted_at: null, created_at: "2026-09-10T00:00:01Z" },
+    { id: "li2", household_id: "hh1", list_id: "l1", household_item_id: "hi1", name: "Pain", quantity: 1, checked: false, checked_at: null, deleted_at: null, created_at: "2026-09-10T00:00:02Z" },
+    { id: "li3", household_id: "hh1", list_id: "l1", household_item_id: "hi2", name: "Œufs", quantity: 3, checked: true, checked_at: now(), deleted_at: null, created_at: "2026-09-10T00:00:03Z" },
+  ],
   recipe_categories: [], tags: [], recipes: [], recipe_files: [], recipe_tags: [],
 };
 if (SCENARIO === "onboard") db.household_members = db.household_members.filter((m) => m.user_id !== "u1");
@@ -28,7 +40,7 @@ const NETWORK_ERROR = { data: null, error: { message: "TypeError: Failed to fetc
 class Query {
   constructor(table) { this.table = table; this.filters = []; this.op = "select"; }
   select(cols = "*") { this.cols = cols; return this; }
-  eq(k, v) { this.filters.push((r) => r[k] === v); return this; }
+  eq(k, v) { this.filters.push((r) => r[k] === v); (this.conds ||= {})[k] = v; return this; }
   is(k, v) { this.filters.push((r) => (r[k] ?? null) === v); return this; }
   in(k, vs) { this.filters.push((r) => vs.includes(r[k])); return this; }
   order(k) { this.orderBy = k; return this; }

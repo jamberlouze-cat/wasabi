@@ -2,8 +2,10 @@ import { supabase } from "./lib/supabase.js";
 import { isConfigured } from "./lib/config.js";
 import { T } from "./lib/textes.js";
 import { icon } from "./lib/icons.js";
+import { esc, toast, closeSheet, sheetIsOpen } from "./lib/ui.js";
+import { renderEpicerie } from "./lib/epicerie.js";
 import {
-  store, restoreCache, clearOfflineData, pull, flush, patch,
+  store, restoreCache, clearOfflineData, pull, flush, patch, applyRemote,
   pendingCount, isOffline, on as onStore,
 } from "./lib/store.js";
 
@@ -23,21 +25,6 @@ const MEMBER_COLORS = ["bleuet", "aubergine", "curcuma", "piment", "gris-400"];
 const app = document.getElementById("app");
 
 // ------------------------------------------------------------------ utils ---
-function esc(s) {
-  return String(s).replace(/[&<>"']/g, (c) => (
-    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
-  ));
-}
-// type : 'ok' | 'alerte' | 'erreur' (liseré de la charte)
-function toast(msg, { type = "ok", ms = 2200 } = {}) {
-  let t = document.querySelector(".toast");
-  if (!t) { t = document.createElement("div"); t.className = "toast"; t.setAttribute("role", "status"); document.body.appendChild(t); }
-  t.textContent = msg;
-  t.dataset.type = type;
-  requestAnimationFrame(() => t.classList.add("show"));
-  clearTimeout(t._to);
-  t._to = setTimeout(() => t.classList.remove("show"), ms);
-}
 function frDate(d, opts) { return new Intl.DateTimeFormat("fr-CA", opts).format(d); }
 const sameDay = (a, b) => a.toDateString() === b.toDateString();
 
@@ -83,16 +70,26 @@ function scheduleReload() {
 // On garde le canal sous la main pour vérifier son état au réveil et le rouvrir
 // au besoin, et on recharge les données à chaque reconnexion : ce qui s'est
 // passé pendant la coupure n'a jamais été reçu.
-const REALTIME_TABLES = ["household_members", "grocery_lists", "list_items", "household_items", "aisles"];
+// Tables de données : la ligne reçue est appliquée telle quelle (pas de
+// rechargement complet à chaque coche). Recettes : à ajouter en phase 3.
+const REALTIME_TABLES = ["grocery_lists", "list_items", "household_items", "aisles"];
+let renderTimer = null;
+function onRemoteRow(table, payload) {
+  applyRemote(table, payload.new);
+  clearTimeout(renderTimer);
+  renderTimer = setTimeout(renderScreen, 60);
+}
 let channel = null;
 function subscribeRealtime() {
   if (channel) { supabase.removeChannel(channel); channel = null; }
   let firstJoin = true;
   const hid = store.household.id;
   channel = supabase.channel("hh-" + hid)
-    .on("postgres_changes", { event: "*", schema: "public", table: "households", filter: `id=eq.${hid}` }, scheduleReload);
+    .on("postgres_changes", { event: "*", schema: "public", table: "households", filter: `id=eq.${hid}` }, scheduleReload)
+    .on("postgres_changes", { event: "*", schema: "public", table: "household_members", filter: `household_id=eq.${hid}` }, scheduleReload);
   for (const table of REALTIME_TABLES) {
-    channel.on("postgres_changes", { event: "*", schema: "public", table, filter: `household_id=eq.${hid}` }, scheduleReload);
+    channel.on("postgres_changes", { event: "*", schema: "public", table, filter: `household_id=eq.${hid}` },
+      (payload) => onRemoteRow(table, payload));
   }
   channel.subscribe((status) => {
     if (status !== "SUBSCRIBED") return;
@@ -122,9 +119,12 @@ function renderApp() {
 function renderScreen() {
   const screen = document.getElementById("screen");
   if (!screen) return;
+  // L'épicerie se met à jour par morceaux (le champ d'ajout garde le focus).
+  if (ui.tab === "epicerie") { renderEpicerie(screen); return; }
   // Ne pas reconstruire un écran où l'on est en train d'écrire.
   if (screen.contains(document.activeElement) && document.activeElement.matches("input, textarea")) return;
-  screen.innerHTML = { epicerie: epicerieHtml, recettes: recettesHtml, reglages: reglagesHtml }[ui.tab]();
+  document.body.classList.remove("clavier");
+  screen.innerHTML = { recettes: recettesHtml, reglages: reglagesHtml }[ui.tab]();
 }
 
 function placeholderHtml(titre, icone, texte) {
@@ -135,7 +135,6 @@ function placeholderHtml(titre, icone, texte) {
       <p>${texte}</p>
     </div>`;
 }
-const epicerieHtml = () => placeholderHtml(T.onglets.epicerie, "panier", T.epicerieVide);
 const recettesHtml = () => placeholderHtml(T.onglets.recettes, "livre", T.recettesVide);
 
 // --------------------------------------------------------------- réglages ---
@@ -379,6 +378,7 @@ async function boot() {
 }
 
 function resetToSignedOut() {
+  closeSheet();
   clearOfflineData();
   if (channel) { supabase.removeChannel(channel); channel = null; }
   renderAuth();
@@ -399,6 +399,8 @@ document.addEventListener("click", (e) => {
     try { localStorage.setItem(TAB_KEY, ui.tab); } catch { /* rien */ }
     document.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-current", b.dataset.tab === ui.tab ? "page" : "false"));
     document.activeElement?.blur();
+    if (sheetIsOpen()) closeSheet();
+    document.getElementById("screen").innerHTML = "";   // repartir d'un écran neuf
     renderScreen();
     window.scrollTo(0, 0);
     return;

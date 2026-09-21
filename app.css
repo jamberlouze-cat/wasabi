@@ -228,6 +228,287 @@ input:focus {
 }
 .empty-icon .ic { width: 32px; height: 32px; }
 
+/* ------------------------------------------------------------- épicerie */
+#ep { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+
+.icon-btn {
+  width: 44px; height: 44px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.icon-btn:active { background: var(--surface-2); }
+
+.emoji-pill {
+  width: 40px; height: 40px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  line-height: 1;
+  border-radius: 50%;
+  background: var(--surface-2);
+}
+
+/* Écran des listes */
+.lists { display: flex; flex-direction: column; gap: 8px; }
+.list-row {
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.list-open {
+  flex: 1;
+  min-width: 0;
+  min-height: 64px;
+  padding: 0 8px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.list-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 17px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.list-count { flex: none; font-size: 14px; color: var(--text-muted); }
+
+/* Écran d'une liste */
+.list-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 -8px;
+}
+.list-head h1 {
+  flex: 1;
+  min-width: 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* La boîte d'ajout est fixe : la liste doit pouvoir défiler au-dessus. */
+.items { display: flex; flex-direction: column; gap: 6px; padding-bottom: 130px; }
+
+.item {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  padding-right: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.item-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 56px;
+  margin-right: 12px;   /* sépare bien la zone qui coche du sélecteur de quantité */
+  padding: 6px 0 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.case {
+  width: 24px; height: 24px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--text-disabled);
+  border-radius: 7px;
+}
+.case .ic { width: 16px; height: 16px; stroke-width: 3; }
+.item-name { min-width: 0; overflow-wrap: anywhere; }
+.item.checked .case { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.item.checked .item-name { color: var(--text-disabled); text-decoration: line-through; }
+.item-qte { flex: none; padding: 0 12px; color: var(--text-disabled); font-weight: 600; }
+.item.flash { animation: flash 1.2s ease-out; }
+@keyframes flash {
+  0%, 35% { background: var(--tag-bg); border-color: var(--focus-ring); }
+}
+
+/* Sélecteur de quantité (− 2 +) : zones tactiles de 44 px */
+.pas {
+  flex: none;
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.pas button {
+  width: 44px; height: 44px;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.pas button:active:not(:disabled) { background: var(--surface-2); border-radius: var(--radius-sm); }
+.pas button:disabled { color: var(--text-disabled); cursor: default; }
+.pas output { min-width: 22px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+.item .pas { border-color: transparent; background: none; }
+
+/* Boîte d'ajout : fixée au-dessus de la barre d'onglets, collée au clavier */
+.ajout {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+  z-index: 9;
+  padding: 8px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  will-change: transform;
+}
+.ajout-in { max-width: calc(var(--col) - 24px); margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+.ligne { display: flex; gap: 8px; align-items: center; }
+.ligne input { flex: 1; }
+.ligne .pas button { height: 46px; }
+
+.puces { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.puces::-webkit-scrollbar { display: none; }
+.puces:empty, .completions:empty { display: none; }
+.puce {
+  flex: none;
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 0;
+  border-radius: 19px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.puce:active { color: var(--tag-text); background: var(--tag-bg); }
+
+.completions {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.completion {
+  min-height: 46px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.completion:first-child { border-top: 0; }
+.completion:active { background: var(--tag-bg); }
+.completion-new { justify-content: flex-start; color: var(--accent-text); font-weight: 600; }
+.completion-new .ic { width: 18px; height: 18px; }
+
+/* Clavier ouvert : la boîte se pose sur le clavier, la barre d'onglets se cache. */
+body.clavier .tabbar { display: none; }
+body.clavier .ajout { bottom: 0; }
+
+/* -------------------------------------------------------------- feuilles */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: var(--scrim);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.scrim.open { opacity: 1; pointer-events: auto; }
+.sheet {
+  width: 100%;
+  max-width: var(--col);
+  max-height: 90dvh;
+  overflow-y: auto;
+  padding: 8px 16px calc(20px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg);
+  border-radius: 22px 22px 0 0;
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+}
+.scrim.open .sheet { transform: translateY(0); }
+.grab { width: 40px; height: 4px; flex: none; margin: 6px auto 8px; border-radius: 4px; background: var(--border); }
+.sheet h2 { font-size: 19px; padding: 0 2px 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.form-sheet { display: flex; flex-direction: column; gap: 14px; margin-bottom: 6px; }
+
+.menu-item {
+  min-height: 52px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  font-weight: 600;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.menu-item:active { background: var(--surface-2); }
+.menu-item .ic { width: 20px; height: 20px; color: var(--text-muted); }
+.menu-item.danger, .menu-item.danger .ic { color: var(--danger); }
+
+.emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.emoji-choice {
+  aspect-ratio: 1;
+  min-height: 44px;
+  font-size: 22px;
+  line-height: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.emoji-choice[aria-pressed="true"] { background: var(--tag-bg); border: 2px solid var(--focus-ring); }
+
 /* ----------------------------------------------------- bandeau de réseau */
 .net-banner {
   position: sticky;
@@ -318,6 +599,7 @@ input:focus {
 :root[data-theme="dark"] .toast { --toast-bg: var(--surface-2); }
 
 @media (prefers-reduced-motion: reduce) {
-  .toast { transition: none; }
+  .toast, .scrim, .sheet { transition: none; }
+  .item.flash { animation: none; }
   .spinner { animation-duration: 2s; }
 }

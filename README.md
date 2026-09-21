@@ -10,8 +10,11 @@ foyer, partagés en temps réel et utilisables hors ligne. Remplace Umami.
 Documents de référence : `FEUILLE_DE_ROUTE.md` (portée et phases),
 `CHARTE-COULEURS.md` (couleurs), `REUTILISATION.md` (ce qui vient de Calico et Panache).
 
-**État : phase 0 (socle).** Connexion, foyer, invitation, coquille PWA, couche
-hors ligne, schéma complet. Les listes arrivent en phase 1.
+**État : phase 1 (épicerie).** Listes avec emoji, articles, quantités, boîte
+d'ajout avec suggestions par fréquence et autocomplétion sur la mémoire du foyer,
+tout cocher / décocher / effacer les cochés, temps réel et hors ligne. Une seule
+allée pour l'instant (tri par ordre d'ajout) : le catalogue et les allées
+arrivent en phase 2.
 
 ---
 
@@ -74,6 +77,9 @@ app.js                  auth, foyer, onglets, réglages, temps réel, réveil
 lib/config.js           ← adresse et clé publique Supabase
 lib/supabase.js         client Supabase
 lib/store.js            couche hors ligne : copie locale + file de patchs par champ
+lib/epicerie.js         onglet Épicerie : listes, articles, boîte d'ajout collée au clavier
+lib/noms.js             noms normalisés + identifiants stables (pas de doublon à la synchro)
+lib/ui.js               échappement, toasts, feuilles du bas
 lib/textes.js           toutes les chaînes de l'interface (français)
 lib/icons.js            icônes SVG en ligne
 lib/vendor/             supabase-js embarqué (démarrage sans réseau)
