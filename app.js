@@ -134,6 +134,7 @@ function renderScreen() {
   if (screen.contains(document.activeElement) && document.activeElement.matches("input, textarea")) return;
   dock.innerHTML = "";
   screen.innerHTML = reglagesHtml();
+  showVersion();
 }
 
 // --------------------------------------------------------------- réglages ---
@@ -142,6 +143,16 @@ function syncStateText() {
   if (n) return isOffline() ? T.aEnvoyer(n) : T.envoiEnCours(n);
   if (!store.syncedAt) return T.jamaisSynchronise;
   return isOffline() ? `${T.horsLigne}${sinceText()}` : T.aJour;
+}
+
+// Numéro de la coquille en cache (CACHE de sw.js) : « Version 14 ».
+async function showVersion() {
+  const el = document.getElementById("app-version");
+  if (!el) return;
+  try {
+    const n = (await caches.keys()).map((k) => k.match(/^wasabi-v(\d+)$/)?.[1]).filter(Boolean).sort((a, b) => b - a)[0];
+    if (n) el.textContent = T.version(n);
+  } catch { /* pas de cache : rien à montrer */ }
 }
 
 function reglagesHtml() {
@@ -181,6 +192,7 @@ function reglagesHtml() {
     <section class="card">
       <div class="label">${T.synchro}</div>
       <p class="sync" id="sync-state">${esc(syncStateText())}</p>
+      <p class="help" id="app-version"></p>
     </section>
 
     <button class="btn btn-block" data-act="signout">${T.seDeconnecter}</button>`;
