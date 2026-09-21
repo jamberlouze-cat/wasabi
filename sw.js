@@ -6,7 +6,7 @@
 //   aucun CDN à mettre en cache.
 // - Les données Supabase ne passent jamais par ici : c'est lib/store.js qui en
 //   garde une copie sur l'appareil.
-const CACHE = "wasabi-v11";
+const CACHE = "wasabi-v12";
 const MEDIA = "wasabi-media-v1";   // images et PDF des recettes (lib/media.js) : à garder
 const NETWORK_TIMEOUT_MS = 3000;
 const SHELL = [
@@ -27,6 +27,9 @@ const SHELL = [
   "./lib/reglages-vues.js",
   "./lib/recettes.js",
   "./lib/media.js",
+  "./lib/pdf.js",
+  "./lib/vendor/pdf.min.mjs",
+  "./lib/vendor/pdf.worker.min.mjs",
   "./lib/vendor/supabase-js.js",
   "./manifest.webmanifest",
   "./assets/icon-180.png",

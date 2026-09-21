@@ -606,8 +606,8 @@ body.clavier .tabbar { display: none; }
 .tile.sans-image .tile-name { color: var(--text); background: none; }
 .tile-info {
   position: absolute;
-  top: 0; right: 0;
-  width: 44px; height: 44px;
+  top: 6px; right: 6px;
+  width: 40px; height: 40px;
   display: grid;
   place-items: center;
   color: var(--off-white);
@@ -682,6 +682,9 @@ button.file-thumb { cursor: pointer; }
 }
 .thumb-x .ic { width: 24px; height: 24px; padding: 4px; border-radius: 50%; background: var(--tile-shade); }
 
+.select-wrap { position: relative; }
+.select-wrap select { padding-right: 44px; }
+.select-wrap .ic { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--text-muted); pointer-events: none; }
 .form-page { display: flex; flex-direction: column; gap: 16px; }
 #rf { display: flex; flex-direction: column; gap: 14px; }
 #rf-tags, #rf-files { display: flex; flex-direction: column; gap: 8px; }
@@ -738,7 +741,6 @@ textarea:focus, select:focus { outline: 2px solid var(--focus-ring); outline-off
   padding-bottom: env(safe-area-inset-bottom);
 }
 .viewer-img { max-width: 100%; max-height: 100%; transform-origin: center; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-.viewer-pdf { width: 100%; height: 100%; border: 0; background: var(--off-white); touch-action: auto; }
 .viewer-open { position: absolute; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); color: var(--noir); background: var(--off-white); border-color: transparent; }
 .viewer-open[hidden] { display: none; }
 .viewer-msg { padding: 0 32px; text-align: center; color: var(--gris-400); }

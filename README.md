@@ -88,7 +88,8 @@ lib/noms.js             noms normalisés + identifiants stables (pas de doublon 
 lib/ui.js               échappement, toasts, feuilles du bas
 lib/textes.js           toutes les chaînes de l'interface (français)
 lib/icons.js            icônes SVG en ligne
-lib/vendor/             supabase-js embarqué (démarrage sans réseau)
+lib/pdf.js              PDF dessinés page par page (pdf.js), vignette de la 1re page
+lib/vendor/             supabase-js et pdf.js embarqués (tout fonctionne sans réseau)
 manifest.webmanifest    métadonnées PWA (+ share_target pour Android)
 sw.js                   service worker (installable, coquille hors ligne)
 schema.sql              schéma complet, RLS, semis, Storage, temps réel (nouvelle installation)
