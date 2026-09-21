@@ -1,5 +1,5 @@
 -- ============================================================================
---  Wasabi — migration « phase 2 » : gabarit de 12 allées + note sur un article
+--  Wasabi — migration « phase 2 » : gabarit de 13 allées + note sur un article
 --  À passer UNE fois sur une base déjà installée :
 --  Supabase → SQL Editor → New query → coller → Run.
 --  Fonctionne quel que soit l'état des allées du foyer.
@@ -10,7 +10,7 @@
 -- Note libre sur une ligne de liste (marque, type : « à fouetter », « sans lactose »…).
 alter table public.list_items add column if not exists note text;
 
--- Gabarit d'allées par défaut : 12 allées, dans l'ordre du parcours en magasin
+-- Gabarit d'allées par défaut : 13 allées, dans l'ordre du parcours en magasin
 -- (validé par Maxime le 2026-09-21 ; l'ordre se personnalisera dans Réglages >
 -- Allées). color_key = pastille de la charte.
 -- Sans danger à repasser : n'ajoute que les allées qui manquent au foyer.
@@ -24,18 +24,19 @@ begin
   insert into public.aisles (household_id, key, name, position, color_key)
   select p_hh, t.key, t.name, t.pos, t.color
   from (values
-    ('fruits_legumes',   'Fruits et légumes',                   10, 'fruits-legumes'),
-    ('boulangerie',      'Boulangerie',                         20, 'boulangerie'),
-    ('fromages_fins',    'Fromages et épicerie fine',           30, 'laitiers'),
-    ('viandes_poissons', 'Viandes, poissons et fruits de mer',  40, 'viandes-poissons'),
-    ('garde_manger',     'Garde-manger',                        50, 'garde-manger'),
-    ('laitiers_oeufs',   'Produits laitiers et œufs',           60, 'laitiers'),
-    ('boissons',         'Boissons',                            70, 'boissons'),
-    ('surgeles',         'Surgelés',                            80, 'surgeles'),
-    ('maison_hygiene',   'Maison et hygiène',                   90, 'maison'),
-    ('bebe',             'Bébé',                               100, 'maison'),
-    ('animaux',          'Animaux',                            110, 'maison'),
-    ('autre',            'Autre',                              999, 'maison')
+    ('fruits_legumes',         'Fruits et légumes',          10, 'fruits-legumes'),
+    ('boulangerie',            'Boulangerie',                20, 'boulangerie'),
+    ('fromages_fins',          'Épicerie fine',              30, 'laitiers'),
+    ('viandes',                'Viandes',                    40, 'viandes-poissons'),
+    ('poissons_fruits_de_mer', 'Poissons et fruits de mer',  50, 'surgeles'),
+    ('garde_manger',           'Garde-manger',               60, 'garde-manger'),
+    ('laitiers_oeufs',         'Produits laitiers',          70, 'laitiers'),
+    ('boissons',               'Boissons',                   80, 'boissons'),
+    ('surgeles',               'Surgelés',                   90, 'surgeles'),
+    ('maison_hygiene',         'Produits ménagers',         100, 'maison'),
+    ('bebe',                   'Bébé',                      110, 'maison'),
+    ('animaux',                'Animaux',                   120, 'maison'),
+    ('autre',                  'Autre',                     999, 'maison')
   ) as t(key, name, pos, color)
   where not exists (
     select 1 from public.aisles a
@@ -75,18 +76,19 @@ select public.seed_aisles(id) from public.households;
 update public.aisles a
 set name = t.name, position = t.pos, color_key = t.color
 from (values
-    ('fruits_legumes',   'Fruits et légumes',                   10, 'fruits-legumes'),
-    ('boulangerie',      'Boulangerie',                         20, 'boulangerie'),
-    ('fromages_fins',    'Fromages et épicerie fine',           30, 'laitiers'),
-    ('viandes_poissons', 'Viandes, poissons et fruits de mer',  40, 'viandes-poissons'),
-    ('garde_manger',     'Garde-manger',                        50, 'garde-manger'),
-    ('laitiers_oeufs',   'Produits laitiers et œufs',           60, 'laitiers'),
-    ('boissons',         'Boissons',                            70, 'boissons'),
-    ('surgeles',         'Surgelés',                            80, 'surgeles'),
-    ('maison_hygiene',   'Maison et hygiène',                   90, 'maison'),
-    ('bebe',             'Bébé',                               100, 'maison'),
-    ('animaux',          'Animaux',                            110, 'maison'),
-    ('autre',            'Autre',                              999, 'maison')
+    ('fruits_legumes',         'Fruits et légumes',          10, 'fruits-legumes'),
+    ('boulangerie',            'Boulangerie',                20, 'boulangerie'),
+    ('fromages_fins',          'Épicerie fine',              30, 'laitiers'),
+    ('viandes',                'Viandes',                    40, 'viandes-poissons'),
+    ('poissons_fruits_de_mer', 'Poissons et fruits de mer',  50, 'surgeles'),
+    ('garde_manger',           'Garde-manger',               60, 'garde-manger'),
+    ('laitiers_oeufs',         'Produits laitiers',          70, 'laitiers'),
+    ('boissons',               'Boissons',                   80, 'boissons'),
+    ('surgeles',               'Surgelés',                   90, 'surgeles'),
+    ('maison_hygiene',         'Produits ménagers',         100, 'maison'),
+    ('bebe',                   'Bébé',                      110, 'maison'),
+    ('animaux',                'Animaux',                   120, 'maison'),
+    ('autre',                  'Autre',                     999, 'maison')
 ) as t(key, name, pos, color)
 where a.key = t.key and a.deleted_at is null
   and (a.name, a.position, a.color_key) is distinct from (t.name, t.pos, t.color);
@@ -94,8 +96,8 @@ where a.key = t.key and a.deleted_at is null
 -- 3. Anciennes allées fusionnées : leurs articles passent dans la nouvelle
 --    allée, puis l'ancienne est retirée (suppression logique).
 with fusion(old_key, new_key) as (values
-  ('viandes_volailles',        'viandes_poissons'),
-  ('poissons_fruits_de_mer',   'viandes_poissons'),
+  ('viandes_volailles',        'viandes'),
+  ('viandes_poissons',         'viandes'),
   ('charcuterie_fromages',     'fromages_fins'),
   ('dejeuner_cereales',        'garde_manger'),
   ('collations',               'garde_manger'),

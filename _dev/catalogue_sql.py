@@ -10,7 +10,7 @@ import sys
 import unicodedata
 
 RACINE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-ALLEES = {"fruits_legumes", "boulangerie", "fromages_fins", "viandes_poissons", "garde_manger", "laitiers_oeufs",
+ALLEES = {"fruits_legumes", "boulangerie", "fromages_fins", "viandes", "poissons_fruits_de_mer", "garde_manger", "laitiers_oeufs",
           "boissons", "surgeles", "maison_hygiene", "bebe", "animaux", "autre"}
 
 

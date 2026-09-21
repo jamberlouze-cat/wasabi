@@ -281,7 +281,7 @@ end $$;
 
 -- ---------- Semis d'un nouveau foyer ----------------------------------------
 
--- Gabarit d'allées par défaut : 12 allées, dans l'ordre du parcours en magasin
+-- Gabarit d'allées par défaut : 13 allées, dans l'ordre du parcours en magasin
 -- (validé par Maxime le 2026-09-21 ; l'ordre se personnalisera dans Réglages >
 -- Allées). color_key = pastille de la charte.
 -- Sans danger à repasser : n'ajoute que les allées qui manquent au foyer.
@@ -295,18 +295,19 @@ begin
   insert into public.aisles (household_id, key, name, position, color_key)
   select p_hh, t.key, t.name, t.pos, t.color
   from (values
-    ('fruits_legumes',   'Fruits et légumes',                   10, 'fruits-legumes'),
-    ('boulangerie',      'Boulangerie',                         20, 'boulangerie'),
-    ('fromages_fins',    'Fromages et épicerie fine',           30, 'laitiers'),
-    ('viandes_poissons', 'Viandes, poissons et fruits de mer',  40, 'viandes-poissons'),
-    ('garde_manger',     'Garde-manger',                        50, 'garde-manger'),
-    ('laitiers_oeufs',   'Produits laitiers et œufs',           60, 'laitiers'),
-    ('boissons',         'Boissons',                            70, 'boissons'),
-    ('surgeles',         'Surgelés',                            80, 'surgeles'),
-    ('maison_hygiene',   'Maison et hygiène',                   90, 'maison'),
-    ('bebe',             'Bébé',                               100, 'maison'),
-    ('animaux',          'Animaux',                            110, 'maison'),
-    ('autre',            'Autre',                              999, 'maison')
+    ('fruits_legumes',         'Fruits et légumes',          10, 'fruits-legumes'),
+    ('boulangerie',            'Boulangerie',                20, 'boulangerie'),
+    ('fromages_fins',          'Épicerie fine',              30, 'laitiers'),
+    ('viandes',                'Viandes',                    40, 'viandes-poissons'),
+    ('poissons_fruits_de_mer', 'Poissons et fruits de mer',  50, 'surgeles'),
+    ('garde_manger',           'Garde-manger',               60, 'garde-manger'),
+    ('laitiers_oeufs',         'Produits laitiers',          70, 'laitiers'),
+    ('boissons',               'Boissons',                   80, 'boissons'),
+    ('surgeles',               'Surgelés',                   90, 'surgeles'),
+    ('maison_hygiene',         'Produits ménagers',         100, 'maison'),
+    ('bebe',                   'Bébé',                      110, 'maison'),
+    ('animaux',                'Animaux',                   120, 'maison'),
+    ('autre',                  'Autre',                     999, 'maison')
   ) as t(key, name, pos, color)
   where not exists (
     select 1 from public.aisles a

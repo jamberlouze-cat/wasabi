@@ -76,28 +76,28 @@ Trempette,,fromages_fins
 Olives,,fromages_fins
 Prosciutto,,fromages_fins
 Salami,,fromages_fins
-Poulet,Poitrines de poulet,viandes_poissons
-Hauts de cuisse de poulet,Cuisses de poulet,viandes_poissons
-Poulet entier,Poulet rôti,viandes_poissons
-Bœuf haché,Steak haché,viandes_poissons
-Steak,Bifteck,viandes_poissons
-Porc haché,,viandes_poissons
-Filet de porc,,viandes_poissons
-Côtelettes de porc,,viandes_poissons
-Bacon,,viandes_poissons
-Saucisses,,viandes_poissons
-Jambon,Jambon tranché,viandes_poissons
-Dinde tranchée,,viandes_poissons
-Saumon,,viandes_poissons
-Saumon fumé,,viandes_poissons
-Crevettes,,viandes_poissons
-Morue,,viandes_poissons
-Tilapia,,viandes_poissons
-Sole,,viandes_poissons
-Aiglefin,,viandes_poissons
-Truite,,viandes_poissons
-Pétoncles,,viandes_poissons
-Moules,,viandes_poissons
+Poulet,Poitrines de poulet,viandes
+Hauts de cuisse de poulet,Cuisses de poulet,viandes
+Poulet entier,Poulet rôti,viandes
+Bœuf haché,Steak haché,viandes
+Steak,Bifteck,viandes
+Porc haché,,viandes
+Filet de porc,,viandes
+Côtelettes de porc,,viandes
+Bacon,,viandes
+Saucisses,,viandes
+Jambon,Jambon tranché,viandes
+Dinde tranchée,,viandes
+Saumon,,poissons_fruits_de_mer
+Saumon fumé,,poissons_fruits_de_mer
+Crevettes,,poissons_fruits_de_mer
+Morue,,poissons_fruits_de_mer
+Tilapia,,poissons_fruits_de_mer
+Sole,,poissons_fruits_de_mer
+Aiglefin,,poissons_fruits_de_mer
+Truite,,poissons_fruits_de_mer
+Pétoncles,,poissons_fruits_de_mer
+Moules,,poissons_fruits_de_mer
 Pâtes,,garde_manger
 Spaghetti,,garde_manger
 Spaghettini,,garde_manger

@@ -13,7 +13,7 @@ Documents de référence : `FEUILLE_DE_ROUTE.md` (portée et phases),
 **État : phase 1 (épicerie).** Listes avec emoji, articles, quantités, boîte
 d'ajout avec suggestions par fréquence et autocomplétion sur la mémoire du foyer,
 tout cocher / décocher / effacer les cochés, temps réel et hors ligne. Articles classés
-par allée (12 allées) puis par ordre alphabétique ; un catalogue québécois
+par allée (13 allées) puis par ordre alphabétique ; un catalogue québécois
 (`catalogue.csv`) donne son allée à chaque nouvel article.
 
 ---
@@ -84,7 +84,7 @@ lib/vendor/             supabase-js embarqué (démarrage sans réseau)
 manifest.webmanifest    métadonnées PWA (+ share_target pour Android)
 sw.js                   service worker (installable, coquille hors ligne)
 schema.sql              schéma complet, RLS, semis, Storage, temps réel (nouvelle installation)
-migration-phase2.sql    gabarit des 12 allées + note d'article, à passer une fois sur une base déjà installée
+migration-phase2.sql    gabarit des 13 allées + note d'article, à passer une fois sur une base déjà installée
 catalogue.csv           catalogue d'articles (nom, synonymes séparés par « | », cle_allee) — à corriger ici
 catalogue.sql           généré par `python3 _dev/catalogue_sql.py`, à passer dans Supabase
 worker.js               waker Supabase, /_ping, habillage de l'aperçu, /api/ (phase 3)
