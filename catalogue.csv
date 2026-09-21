@@ -1,0 +1,198 @@
+nom,synonymes,cle_allee
+Bananes,,fruits_legumes
+Pommes,,fruits_legumes
+Oranges,,fruits_legumes
+Clémentines,Mandarines,fruits_legumes
+Citrons,,fruits_legumes
+Limes,,fruits_legumes
+Raisins,,fruits_legumes
+Fraises,,fruits_legumes
+Bleuets,,fruits_legumes
+Framboises,,fruits_legumes
+Poires,,fruits_legumes
+Melon d'eau,Pastèque,fruits_legumes
+Cantaloup,,fruits_legumes
+Ananas,,fruits_legumes
+Avocats,,fruits_legumes
+Tomates,,fruits_legumes
+Tomates cerises,,fruits_legumes
+Concombres,Concombre anglais,fruits_legumes
+Laitue,Salade|Laitue romaine,fruits_legumes
+Épinards,Bébés épinards,fruits_legumes
+Roquette,,fruits_legumes
+Carottes,,fruits_legumes
+Céleri,,fruits_legumes
+Oignons,Oignons jaunes,fruits_legumes
+Oignons rouges,,fruits_legumes
+Oignons verts,Échalotes,fruits_legumes
+Échalotes françaises,,fruits_legumes
+Ail,,fruits_legumes
+Gingembre,,fruits_legumes
+Pommes de terre,Patates,fruits_legumes
+Patates douces,,fruits_legumes
+Poivrons,Piments,fruits_legumes
+Brocoli,,fruits_legumes
+Chou-fleur,,fruits_legumes
+Champignons,,fruits_legumes
+Courgettes,Zucchinis,fruits_legumes
+Maïs,Blé d'Inde,fruits_legumes
+Haricots verts,Fèves vertes,fruits_legumes
+Asperges,,fruits_legumes
+Chou,,fruits_legumes
+Chou kale,Kale,fruits_legumes
+Courge,Courge musquée|Butternut,fruits_legumes
+Coriandre,,fruits_legumes
+Persil,,fruits_legumes
+Basilic,,fruits_legumes
+Tofu,,fruits_legumes
+Pain,Pain tranché,boulangerie
+Baguette,Pain baguette,boulangerie
+Bagels,,boulangerie
+Muffins anglais,,boulangerie
+Tortillas,Wraps,boulangerie
+Pains à hamburger,,boulangerie
+Pains à hot-dog,,boulangerie
+Pitas,Pains pita,boulangerie
+Pain naan,Naan,boulangerie
+Croissants,,boulangerie
+Poulet,Poitrines de poulet,viandes_poissons
+Hauts de cuisse de poulet,Cuisses de poulet,viandes_poissons
+Poulet entier,Poulet rôti,viandes_poissons
+Bœuf haché,Steak haché,viandes_poissons
+Steak,Bifteck,viandes_poissons
+Porc haché,,viandes_poissons
+Filet de porc,,viandes_poissons
+Côtelettes de porc,,viandes_poissons
+Bacon,,viandes_poissons
+Saucisses,,viandes_poissons
+Jambon,Jambon tranché,viandes_poissons
+Dinde tranchée,,viandes_poissons
+Saumon,,viandes_poissons
+Saumon fumé,,viandes_poissons
+Crevettes,,viandes_poissons
+Filets de poisson,Poisson blanc|Morue,viandes_poissons
+Fromage cheddar,Cheddar,viandes_poissons
+Fromage mozzarella,Mozzarella,viandes_poissons
+Fromage parmesan,Parmesan,viandes_poissons
+Fromage feta,Feta,viandes_poissons
+Fromage en grains,Crottes de fromage,viandes_poissons
+Fromage de chèvre,,viandes_poissons
+Houmous,Hummus,viandes_poissons
+Pâtes,Spaghetti|Macaroni,garde_manger
+Riz,,garde_manger
+Quinoa,,garde_manger
+Couscous,,garde_manger
+Sauce tomate,Sauce à spaghetti,garde_manger
+Tomates en conserve,Tomates en dés,garde_manger
+Pâte de tomate,,garde_manger
+Bouillon de poulet,Bouillon,garde_manger
+Thon en conserve,Thon,garde_manger
+Pois chiches,,garde_manger
+Haricots noirs,Fèves noires,garde_manger
+Lentilles,,garde_manger
+Maïs en conserve,,garde_manger
+Soupe en conserve,Soupe,garde_manger
+Lait de coco,,garde_manger
+Huile d'olive,,garde_manger
+Huile végétale,Huile de canola,garde_manger
+Vinaigre,Vinaigre blanc,garde_manger
+Vinaigre balsamique,,garde_manger
+Ketchup,,garde_manger
+Moutarde,Moutarde de Dijon,garde_manger
+Mayonnaise,,garde_manger
+Sauce soya,Sauce soja,garde_manger
+Salsa,,garde_manger
+Vinaigrette,,garde_manger
+Sel,,garde_manger
+Poivre,,garde_manger
+Épices,,garde_manger
+Sirop d'érable,,garde_manger
+Miel,,garde_manger
+Farine,,garde_manger
+Sucre,,garde_manger
+Cassonade,Sucre brun,garde_manger
+Poudre à pâte,,garde_manger
+Bicarbonate de soude,Soda à pâte|Petite vache,garde_manger
+Vanille,Extrait de vanille,garde_manger
+Pépites de chocolat,Brisures de chocolat,garde_manger
+Flocons d'avoine,Gruau,garde_manger
+Céréales,,garde_manger
+Beurre d'arachide,Beurre de peanut|Beurre d'arachides,garde_manger
+Confiture,,garde_manger
+Tartinade aux noisettes,Nutella,garde_manger
+Craquelins,Biscuits soda,garde_manger
+Chips,Croustilles,garde_manger
+Barres tendres,Barres granola,garde_manger
+Noix,Amandes|Noix mélangées,garde_manger
+Biscuits,,garde_manger
+Chocolat,,garde_manger
+Maïs soufflé,Popcorn,garde_manger
+Raisins secs,,garde_manger
+Lait,,laitiers_oeufs
+Œufs,,laitiers_oeufs
+Beurre,,laitiers_oeufs
+Yogourt,Yaourt,laitiers_oeufs
+Yogourt grec,,laitiers_oeufs
+Crème,Crème à cuisson|Crème 15 %|Crème 35 %,laitiers_oeufs
+Crème sure,,laitiers_oeufs
+Fromage à la crème,Philadelphia,laitiers_oeufs
+Fromage cottage,,laitiers_oeufs
+Boisson d'amande,Lait d'amande,laitiers_oeufs
+Boisson d'avoine,Lait d'avoine,laitiers_oeufs
+Margarine,,laitiers_oeufs
+Café,,boissons
+Thé,Tisane,boissons
+Jus d'orange,,boissons
+Jus de pomme,,boissons
+Eau pétillante,Eau gazéifiée|Bubly|Perrier,boissons
+Boisson gazeuse,Liqueur|Coke|Pepsi,boissons
+Eau en bouteille,Eau,boissons
+Bière,,boissons
+Vin rouge,,boissons
+Vin blanc,,boissons
+Cidre,,boissons
+Légumes surgelés,,surgeles
+Fruits surgelés,Petits fruits surgelés,surgeles
+Pizza surgelée,Pizza congelée,surgeles
+Crème glacée,,surgeles
+Frites surgelées,Frites,surgeles
+Edamames,,surgeles
+Gaufres surgelées,Gaufres,surgeles
+Pâte à tarte,,surgeles
+Papier hygiénique,Papier de toilette,maison_hygiene
+Essuie-tout,Scott towels,maison_hygiene
+Mouchoirs,Kleenex,maison_hygiene
+Savon à vaisselle,,maison_hygiene
+Détergent à lessive,Savon à linge|Savon à lessive,maison_hygiene
+Pastilles pour lave-vaisselle,Savon à lave-vaisselle,maison_hygiene
+Sacs à ordures,Sacs à poubelle|Sacs à vidanges,maison_hygiene
+Sacs de compost,,maison_hygiene
+Papier d'aluminium,,maison_hygiene
+Pellicule plastique,Saran wrap,maison_hygiene
+Papier parchemin,,maison_hygiene
+Sacs à sandwich,Sacs Ziploc|Ziploc,maison_hygiene
+Éponges,,maison_hygiene
+Nettoyant tout usage,,maison_hygiene
+Dentifrice,Pâte à dents,maison_hygiene
+Brosse à dents,,maison_hygiene
+Soie dentaire,,maison_hygiene
+Shampoing,Shampooing,maison_hygiene
+Revitalisant,,maison_hygiene
+Savon pour le corps,Gel douche,maison_hygiene
+Savon à mains,,maison_hygiene
+Déodorant,Antisudorifique,maison_hygiene
+Rasoirs,Lames de rasoir,maison_hygiene
+Crème solaire,,maison_hygiene
+Tylenol,Acétaminophène,maison_hygiene
+Advil,Ibuprofène,maison_hygiene
+Pansements,Plasters|Band-Aid,maison_hygiene
+Tampons,Serviettes hygiéniques,maison_hygiene
+Cotons-tiges,Q-tips,maison_hygiene
+Couches,,bebe
+Lingettes pour bébé,Lingettes,bebe
+Purées pour bébé,,bebe
+Préparation pour nourrissons,Lait maternisé,bebe
+Nourriture pour chat,Bouffe à chat,animaux
+Nourriture pour chien,Bouffe à chien,animaux
+Litière,Litière à chat,animaux
+Gâteries pour animaux,,animaux

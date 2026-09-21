@@ -35,6 +35,12 @@ const db = {
     { id: "li2", household_id: "hh1", list_id: "l1", household_item_id: "hi1", name: "Pain", quantity: 1, checked: false, checked_at: null, deleted_at: null, created_at: "2026-09-10T00:00:02Z" },
     { id: "li3", household_id: "hh1", list_id: "l1", household_item_id: "hi2", name: "Œufs", quantity: 3, checked: true, checked_at: now(), deleted_at: null, created_at: "2026-09-10T00:00:03Z" },
   ],
+  catalog_items: [
+    { id: "c1", name: "Pommes de terre", name_normalized: "pommes de terre", synonyms: ["Patates"], default_aisle_key: "fruits_legumes" },
+    { id: "c2", name: "Baguette", name_normalized: "baguette", synonyms: ["Pain baguette"], default_aisle_key: "boulangerie" },
+    { id: "c3", name: "Yogourt", name_normalized: "yogourt", synonyms: ["Yaourt"], default_aisle_key: "laitiers_oeufs" },
+    { id: "c4", name: "Café", name_normalized: "cafe", synonyms: [], default_aisle_key: "boissons" },
+  ],
   recipe_categories: [], tags: [], recipes: [], recipe_files: [], recipe_tags: [],
 };
 if (SCENARIO === "onboard") db.household_members = db.household_members.filter((m) => m.user_id !== "u1");

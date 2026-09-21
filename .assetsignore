@@ -18,3 +18,5 @@ _test.html
 .DS_Store
 .wrangler/
 node_modules/
+catalogue.csv
+catalogue.sql
