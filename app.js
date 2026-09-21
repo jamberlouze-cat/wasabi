@@ -3,7 +3,7 @@ import { isConfigured } from "./lib/config.js";
 import { T } from "./lib/textes.js";
 import { icon } from "./lib/icons.js";
 import { esc, toast, closeSheet, sheetIsOpen, initViewport } from "./lib/ui.js";
-import { renderEpicerie } from "./lib/epicerie.js";
+import { renderEpicerie, showLists } from "./lib/epicerie.js";
 import {
   store, restoreCache, clearOfflineData, pull, flush, patch, applyRemote,
   pendingCount, isOffline, on as onStore,
@@ -396,6 +396,11 @@ document.addEventListener("click", (e) => {
   if (!btn) return;
 
   if (btn.dataset.tab) {
+    if (btn.dataset.tab === "epicerie" && ui.tab === "epicerie") {
+      document.activeElement?.blur();
+      if (sheetIsOpen()) closeSheet();
+      return showLists();
+    }
     ui.tab = btn.dataset.tab;
     try { localStorage.setItem(TAB_KEY, ui.tab); } catch { /* rien */ }
     document.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-current", b.dataset.tab === ui.tab ? "page" : "false"));

@@ -5,7 +5,7 @@
 :root {
   --radius: 14px;
   --radius-sm: 10px;
-  --tabbar-h: 58px;
+  --tabbar-h: 50px;
   --col: 560px;   /* à l'ordinateur : l'interface mobile centrée dans une colonne */
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
@@ -16,7 +16,7 @@ html { -webkit-text-size-adjust: 100%; }
 
 /* La page ne défile jamais : seul l'écran du milieu (.screen) défile. Rien ne
    « flotte » quand on tire une liste au bout de sa course. */
-html, body { height: 100%; overflow: hidden; }
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 
 body {
   position: fixed;
@@ -183,6 +183,17 @@ input:focus {
   gap: 12px;
 }
 .screen > * { flex-shrink: 0; }
+/* Toujours 1 px à faire défiler : même courte, la liste garde le geste pour
+   elle (rebond interne). Sinon iOS fait rebondir la page entière. */
+.screen { position: relative; }
+.screen::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 1px;
+  height: calc(100% + 1px);
+  pointer-events: none;
+}
 .net-banner:not([hidden]) + .screen { padding-top: 12px; }
 
 .screen-head { padding: 8px 2px 4px; }
@@ -357,8 +368,6 @@ input:focus {
 /* Un article = une poubelle (dessous, à droite) + la ligne (dessus) qui glisse. */
 .item {
   position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-sm);
   touch-action: pan-y;   /* le glissement horizontal est à nous */
 }
 .item-del {
@@ -370,10 +379,11 @@ input:focus {
   color: var(--on-danger);
   background: var(--danger);
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   cursor: pointer;
   visibility: hidden;
 }
+.item.open .item-front, .item.swiping .item-front { border-top-right-radius: 0; border-bottom-right-radius: 0; }
 .item.open .item-del, .item.swiping .item-del { visibility: visible; }
 .item-front {
   position: relative;
@@ -417,7 +427,7 @@ input:focus {
 .item-name { min-width: 0; overflow-wrap: anywhere; }
 .item.checked .case { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .item.checked .item-name { color: var(--text-disabled); text-decoration: line-through; }
-.item-qte { flex: none; padding: 0 12px; color: var(--text-disabled); font-weight: 600; }
+.item-qte { flex: none; width: 112px; text-align: center; color: var(--text-disabled); font-weight: 600; font-variant-numeric: tabular-nums; }
 .item.flash .item-front { animation: flash 1.2s ease-out; }
 @keyframes flash {
   0%, 35% { background: var(--tag-bg); border-color: var(--focus-ring); }
@@ -434,8 +444,9 @@ input:focus {
 }
 .pas button {
   width: 44px; height: 44px;
-  font-size: 22px;
-  line-height: 1;
+  padding: 0;
+  display: grid;
+  place-items: center;
   color: var(--text);
   background: none;
   border: 0;
@@ -444,12 +455,13 @@ input:focus {
 }
 .pas button:active:not(:disabled) { background: var(--surface-2); border-radius: var(--radius-sm); }
 .pas button:disabled { color: var(--text-disabled); cursor: default; }
-.pas output { min-width: 22px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+.pas .ic { width: 18px; height: 18px; stroke-width: 2.2; }
+.pas output { width: 24px; flex: none; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
 .item .pas { border-color: transparent; background: none; }
 
 /* Boîte d'ajout : dans le dock, entre l'écran qui défile et la barre d'onglets.
    Elle ne bouge jamais ; clavier ouvert, elle est posée dessus. */
-.dock { flex: none; }
+.dock { flex: none; touch-action: pan-x; }
 .dock:empty { display: none; }
 .ajout {
   padding: 8px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));
@@ -592,9 +604,12 @@ body.clavier .tabbar { display: none; }
   flex: none;
   display: flex;
   justify-content: center;
+  touch-action: none;
+  /* Sur iPhone, la zone sûre du bas (34 px) est généreuse : on en reprend une
+     partie pour que la barre soit moins haute. */
   padding:
     0 env(safe-area-inset-right)
-    env(safe-area-inset-bottom)
+    max(0px, env(safe-area-inset-bottom) - 14px)
     env(safe-area-inset-left);
   background: var(--surface);
   border-top: 1px solid var(--border);
@@ -617,15 +632,13 @@ body.clavier .tabbar { display: none; }
   cursor: pointer;
   touch-action: manipulation;
 }
-.tab[aria-current="page"] { color: var(--text); }
-.tab[aria-current="page"]::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  width: 28px; height: 3px;
-  border-radius: 0 0 3px 3px;
-  background: var(--accent);
+.tab .ic {
+  width: 52px; height: 26px;
+  padding: 2px 15px;
+  border-radius: 13px;
 }
+.tab[aria-current="page"] { color: var(--text); }
+.tab[aria-current="page"] .ic { color: var(--on-accent); background: var(--accent); }
 
 /* ---------------------------------------------------------------- toasts */
 /* Charte : fond Noir en clair, surface-2 en sombre ; texte Off-white ;
