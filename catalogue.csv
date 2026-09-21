@@ -2,7 +2,8 @@ nom,synonymes,cle_allee
 Bananes,,fruits_legumes
 Pommes,,fruits_legumes
 Oranges,,fruits_legumes
-Clémentines,Mandarines,fruits_legumes
+Clémentines,,fruits_legumes
+Mandarines,,fruits_legumes
 Citrons,,fruits_legumes
 Limes,,fruits_legumes
 Raisins,,fruits_legumes
@@ -17,12 +18,16 @@ Avocats,,fruits_legumes
 Tomates,,fruits_legumes
 Tomates cerises,,fruits_legumes
 Concombres,Concombre anglais,fruits_legumes
-Laitue,Salade|Laitue romaine,fruits_legumes
+Laitue,Salade,fruits_legumes
+Laitue romaine,Romaine,fruits_legumes
+Laitue frisée,,fruits_legumes
+Laitue iceberg,Iceberg,fruits_legumes
+Laitue Boston,,fruits_legumes
 Épinards,Bébés épinards,fruits_legumes
 Roquette,,fruits_legumes
 Carottes,,fruits_legumes
 Céleri,,fruits_legumes
-Oignons,Oignons jaunes,fruits_legumes
+Oignons,Onions|Oignons jaunes,fruits_legumes
 Oignons rouges,,fruits_legumes
 Oignons verts,Échalotes,fruits_legumes
 Échalotes françaises,,fruits_legumes
@@ -30,7 +35,8 @@ Ail,,fruits_legumes
 Gingembre,,fruits_legumes
 Pommes de terre,Patates,fruits_legumes
 Patates douces,,fruits_legumes
-Poivrons,Piments,fruits_legumes
+Poivrons,,fruits_legumes
+Piment fort,Piment|Piments|Piments forts|Jalapeño,fruits_legumes
 Brocoli,,fruits_legumes
 Chou-fleur,,fruits_legumes
 Champignons,,fruits_legumes
@@ -40,7 +46,10 @@ Haricots verts,Fèves vertes,fruits_legumes
 Asperges,,fruits_legumes
 Chou,,fruits_legumes
 Chou kale,Kale,fruits_legumes
-Courge,Courge musquée|Butternut,fruits_legumes
+Courge,,fruits_legumes
+Courge musquée,Courge butternut|Butternut,fruits_legumes
+Courge spaghetti,,fruits_legumes
+Courge poivrée,,fruits_legumes
 Coriandre,,fruits_legumes
 Persil,,fruits_legumes
 Basilic,,fruits_legumes
@@ -55,6 +64,18 @@ Pains à hot-dog,,boulangerie
 Pitas,Pains pita,boulangerie
 Pain naan,Naan,boulangerie
 Croissants,,boulangerie
+Fromage parmesan,Parmesan,fromages_fins
+Fromage feta,Feta,fromages_fins
+Fromage de chèvre,,fromages_fins
+Houmous,Hummus,fromages_fins
+Fromage brie,Brie,fromages_fins
+Fromage bleu,,fromages_fins
+Bocconcini,,fromages_fins
+Tzatziki,,fromages_fins
+Trempette,,fromages_fins
+Olives,,fromages_fins
+Prosciutto,,fromages_fins
+Salami,,fromages_fins
 Poulet,Poitrines de poulet,viandes_poissons
 Hauts de cuisse de poulet,Cuisses de poulet,viandes_poissons
 Poulet entier,Poulet rôti,viandes_poissons
@@ -70,15 +91,24 @@ Dinde tranchée,,viandes_poissons
 Saumon,,viandes_poissons
 Saumon fumé,,viandes_poissons
 Crevettes,,viandes_poissons
-Filets de poisson,Poisson blanc|Morue,viandes_poissons
-Fromage cheddar,Cheddar,viandes_poissons
-Fromage mozzarella,Mozzarella,viandes_poissons
-Fromage parmesan,Parmesan,viandes_poissons
-Fromage feta,Feta,viandes_poissons
-Fromage en grains,Crottes de fromage,viandes_poissons
-Fromage de chèvre,,viandes_poissons
-Houmous,Hummus,viandes_poissons
-Pâtes,Spaghetti|Macaroni,garde_manger
+Morue,,viandes_poissons
+Tilapia,,viandes_poissons
+Sole,,viandes_poissons
+Aiglefin,,viandes_poissons
+Truite,,viandes_poissons
+Pétoncles,,viandes_poissons
+Moules,,viandes_poissons
+Pâtes,,garde_manger
+Spaghetti,,garde_manger
+Spaghettini,,garde_manger
+Macaroni,,garde_manger
+Penne,,garde_manger
+Fusilli,,garde_manger
+Linguine,,garde_manger
+Lasagne,Pâtes à lasagne,garde_manger
+Orzo,,garde_manger
+Nouilles de riz,Vermicelles de riz,garde_manger
+Nouilles ramen,Ramen,garde_manger
 Riz,,garde_manger
 Quinoa,,garde_manger
 Couscous,,garde_manger
@@ -98,14 +128,24 @@ Huile végétale,Huile de canola,garde_manger
 Vinaigre,Vinaigre blanc,garde_manger
 Vinaigre balsamique,,garde_manger
 Ketchup,,garde_manger
-Moutarde,Moutarde de Dijon,garde_manger
+Moutarde jaune,Moutarde|Moutarde préparée,garde_manger
+Moutarde de Dijon,Dijon,garde_manger
+Moutarde à l'ancienne,Moutarde de Meaux,garde_manger
 Mayonnaise,,garde_manger
 Sauce soya,Sauce soja,garde_manger
 Salsa,,garde_manger
 Vinaigrette,,garde_manger
 Sel,,garde_manger
 Poivre,,garde_manger
-Épices,,garde_manger
+Cannelle,,garde_manger
+Cumin,,garde_manger
+Paprika,,garde_manger
+Poudre d'ail,,garde_manger
+Poudre d'oignon,,garde_manger
+Origan,,garde_manger
+Poudre de chili,,garde_manger
+Cari,Curry,garde_manger
+Herbes de Provence,,garde_manger
 Sirop d'érable,,garde_manger
 Miel,,garde_manger
 Farine,,garde_manger
@@ -128,6 +168,12 @@ Biscuits,,garde_manger
 Chocolat,,garde_manger
 Maïs soufflé,Popcorn,garde_manger
 Raisins secs,,garde_manger
+Tisane,,garde_manger
+Thé,,garde_manger
+Café,,garde_manger
+Fromage cheddar,Cheddar,laitiers_oeufs
+Fromage mozzarella,Mozzarella,laitiers_oeufs
+Fromage en grains,Crottes de fromage,laitiers_oeufs
 Lait,,laitiers_oeufs
 Œufs,,laitiers_oeufs
 Beurre,,laitiers_oeufs
@@ -140,8 +186,6 @@ Fromage cottage,,laitiers_oeufs
 Boisson d'amande,Lait d'amande,laitiers_oeufs
 Boisson d'avoine,Lait d'avoine,laitiers_oeufs
 Margarine,,laitiers_oeufs
-Café,,boissons
-Thé,Tisane,boissons
 Jus d'orange,,boissons
 Jus de pomme,,boissons
 Eau pétillante,Eau gazéifiée|Bubly|Perrier,boissons
@@ -191,8 +235,8 @@ Cotons-tiges,Q-tips,maison_hygiene
 Couches,,bebe
 Lingettes pour bébé,Lingettes,bebe
 Purées pour bébé,,bebe
-Préparation pour nourrissons,Lait maternisé,bebe
-Nourriture pour chat,Bouffe à chat,animaux
-Nourriture pour chien,Bouffe à chien,animaux
+Préparation pour nourrissons,Lait maternisé|Formule pour bébé,bebe
+Nourriture pour chat,,animaux
+Nourriture pour chien,,animaux
 Litière,Litière à chat,animaux
 Gâteries pour animaux,,animaux

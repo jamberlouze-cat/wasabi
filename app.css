@@ -424,7 +424,10 @@ input:focus {
   border-radius: 7px;
 }
 .case .ic { width: 16px; height: 16px; stroke-width: 3; }
+.item-text { min-width: 0; display: flex; flex-direction: column; }
 .item-name { min-width: 0; overflow-wrap: anywhere; }
+.item-note { font-size: 13px; line-height: 1.25; color: var(--text-muted); overflow-wrap: anywhere; }
+.item.checked .item-note { color: var(--text-disabled); }
 .item.checked .case { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .item.checked .item-name { color: var(--text-disabled); text-decoration: line-through; }
 .item-qte { flex: none; width: 112px; text-align: center; color: var(--text-disabled); font-weight: 600; font-variant-numeric: tabular-nums; }

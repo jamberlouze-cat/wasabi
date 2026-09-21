@@ -103,6 +103,7 @@ create table if not exists public.list_items (
   quantity          int  not null default 1 check (quantity >= 1),   -- jamais mémorisée
   checked           boolean not null default false,
   checked_at        timestamptz,
+  note              text,   -- précision libre (marque, type) ; propre à la ligne
   added_by          uuid references public.household_members(id) on delete set null,
   created_at        timestamptz not null default now(),
   updated_at        timestamptz not null default now(),
@@ -110,6 +111,7 @@ create table if not exists public.list_items (
   foreign key (list_id, household_id)
     references public.grocery_lists(id, household_id) on delete cascade
 );
+alter table public.list_items add column if not exists note text;
 create index if not exists idx_list_items_list on public.list_items(list_id);
 create index if not exists idx_list_items_hh on public.list_items(household_id);
 
@@ -279,7 +281,7 @@ end $$;
 
 -- ---------- Semis d'un nouveau foyer ----------------------------------------
 
--- Gabarit d'allées par défaut : 11 allées, dans l'ordre du parcours en magasin
+-- Gabarit d'allées par défaut : 12 allées, dans l'ordre du parcours en magasin
 -- (validé par Maxime le 2026-09-21 ; l'ordre se personnalisera dans Réglages >
 -- Allées). color_key = pastille de la charte.
 -- Sans danger à repasser : n'ajoute que les allées qui manquent au foyer.
@@ -293,17 +295,18 @@ begin
   insert into public.aisles (household_id, key, name, position, color_key)
   select p_hh, t.key, t.name, t.pos, t.color
   from (values
-    ('fruits_legumes',   'Fruits et légumes',              10, 'fruits-legumes'),
-    ('boulangerie',      'Boulangerie',                    20, 'boulangerie'),
-    ('viandes_poissons', 'Viandes, poissons et fromages',  30, 'viandes-poissons'),
-    ('garde_manger',     'Garde-manger',                   40, 'garde-manger'),
-    ('laitiers_oeufs',   'Produits laitiers et œufs',      50, 'laitiers'),
-    ('boissons',         'Boissons',                       60, 'boissons'),
-    ('surgeles',         'Surgelés',                       70, 'surgeles'),
-    ('maison_hygiene',   'Maison et hygiène',              80, 'maison'),
-    ('bebe',             'Bébé',                           90, 'maison'),
-    ('animaux',          'Animaux',                       100, 'maison'),
-    ('autre',            'Autre',                         999, 'maison')
+    ('fruits_legumes',   'Fruits et légumes',                   10, 'fruits-legumes'),
+    ('boulangerie',      'Boulangerie',                         20, 'boulangerie'),
+    ('fromages_fins',    'Fromages et épicerie fine',           30, 'laitiers'),
+    ('viandes_poissons', 'Viandes, poissons et fruits de mer',  40, 'viandes-poissons'),
+    ('garde_manger',     'Garde-manger',                        50, 'garde-manger'),
+    ('laitiers_oeufs',   'Produits laitiers et œufs',           60, 'laitiers'),
+    ('boissons',         'Boissons',                            70, 'boissons'),
+    ('surgeles',         'Surgelés',                            80, 'surgeles'),
+    ('maison_hygiene',   'Maison et hygiène',                   90, 'maison'),
+    ('bebe',             'Bébé',                               100, 'maison'),
+    ('animaux',          'Animaux',                            110, 'maison'),
+    ('autre',            'Autre',                              999, 'maison')
   ) as t(key, name, pos, color)
   where not exists (
     select 1 from public.aisles a
