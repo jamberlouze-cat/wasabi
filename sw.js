@@ -6,7 +6,7 @@
 //   aucun CDN à mettre en cache.
 // - Les données Supabase ne passent jamais par ici : c'est lib/store.js qui en
 //   garde une copie sur l'appareil.
-const CACHE = "wasabi-v2";
+const CACHE = "wasabi-v3";
 const NETWORK_TIMEOUT_MS = 3000;
 const SHELL = [
   "./",
