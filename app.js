@@ -231,7 +231,6 @@ function renderAuth() {
     <div class="center-screen">
       ${markHtml}
       <h1>${T.app}</h1>
-      <p>${T.slogan}</p>
       <form id="auth-form" class="form">
         <div class="field">
           <label class="label" for="auth-email">${T.courriel}</label>
@@ -242,9 +241,84 @@ function renderAuth() {
           <input type="password" id="auth-pass" name="password" autocomplete="current-password" placeholder="••••••••">
         </div>
         <button type="submit" id="auth-submit" class="btn btn-primary btn-block">${T.continuer}</button>
+        <button type="button" id="auth-forgot" class="link-btn" data-act="forgot">${T.motDePasseOublie}</button>
       </form>
-      <p class="help">${T.premiereConnexion}</p>
+      <p class="help" id="auth-info">${T.premiereConnexion}</p>
     </div>`;
+}
+
+// ------------------------------------------------------- mot de passe oublié ---
+// Supabase envoie un courriel avec un lien qui ramène ici avec
+// #access_token=…&type=recovery (supabase-js ouvre alors la session tout seul),
+// ou #error=…&error_description=… si le lien a expiré.
+let recovery = false;
+
+function readAuthLink() {
+  const p = new URLSearchParams(location.hash.slice(1) + "&" + location.search.slice(1));
+  if (p.get("type") === "recovery") return "recovery";
+  if (p.get("error_description") || p.get("error")) return "error";
+  return null;
+}
+
+async function forgotPassword() {
+  const emailEl = document.getElementById("auth-email");
+  const email = emailEl.value.trim();
+  if (!email || !email.includes("@")) { toast(T.entreCourrielDabord, { type: "alerte", ms: 3500 }); emailEl.focus(); return; }
+  const btn = document.getElementById("auth-forgot");
+  btn.disabled = true;
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+    if (error) {
+      toast(/rate limit|security purposes|after \d+ seconds/i.test(error.message) ? T.tropDeDemandes : error.message, { type: "erreur", ms: 5000 });
+      return;
+    }
+    document.getElementById("auth-info").textContent = T.lienEnvoye;
+  } finally { btn.disabled = false; }
+}
+
+function renderNewPassword(email) {
+  recovery = true;
+  app.innerHTML = `
+    <div class="center-screen">
+      ${markHtml}
+      <h1>${T.nouveauMotDePasse}</h1>
+      <p>${T.nouveauMotDePasseTexte(email || "")}</p>
+      <form id="reset-form" class="form">
+        <div class="field">
+          <label class="label" for="reset-pass">${T.nouveauMotDePasse}</label>
+          <input type="password" id="reset-pass" name="password" autocomplete="new-password" placeholder="••••••••" minlength="6" required>
+        </div>
+        <div class="field">
+          <label class="label" for="reset-pass2">${T.confirmer}</label>
+          <input type="password" id="reset-pass2" name="password2" autocomplete="new-password" placeholder="••••••••" minlength="6" required>
+        </div>
+        <button type="submit" id="reset-submit" class="btn btn-primary btn-block">${T.enregistrer}</button>
+        <button type="button" class="link-btn" data-act="cancel-reset">${T.annuler}</button>
+      </form>
+      <p class="help">${T.nouveauMotDePasseAide}</p>
+    </div>`;
+}
+
+async function submitReset() {
+  const p1 = document.getElementById("reset-pass").value, p2 = document.getElementById("reset-pass2").value;
+  if (p1.length < 6) { toast(T.motDePasseCourt, { type: "alerte" }); return; }
+  if (p1 !== p2) { toast(T.motsDePasseDifferents, { type: "alerte" }); return; }
+  const btn = document.getElementById("reset-submit");
+  btn.disabled = true; btn.textContent = T.unInstant;
+  try {
+    const { error } = await supabase.auth.updateUser({ password: p1 });
+    if (error) {
+      toast(/different from the old/i.test(error.message) ? T.motDePasseIdentique
+        : /weak|easy to guess/i.test(error.message) ? T.motDePasseFaible
+        : /session missing|not authenticated/i.test(error.message) ? T.lienExpire : error.message, { type: "erreur", ms: 5000 });
+      return;
+    }
+    recovery = false;
+    history.replaceState(null, "", location.pathname);
+    toast(T.motDePasseEnregistre);
+    store.user = null;
+    boot();
+  } finally { btn.disabled = false; btn.textContent = T.enregistrer; }
 }
 
 async function submitAuth() {
@@ -368,6 +442,19 @@ async function boot() {
     history.replaceState(null, "", location.pathname);
   }
 
+  // Lien du courriel « Mot de passe oublié ? »
+  const lien = readAuthLink();
+  if (lien === "recovery" || recovery) {
+    const { data: { session: s } } = await supabase.auth.getSession();
+    if (s) { renderNewPassword(s.user.email); return; }
+  }
+  if (lien === "error") {
+    history.replaceState(null, "", location.pathname);
+    clearOfflineData(); renderAuth();
+    toast(T.lienExpire, { type: "erreur", ms: 6000 });
+    return;
+  }
+
   const fromCache = restoreCache();
   if (fromCache) { store.offline = !navigator.onLine; renderApp(); }
   else app.innerHTML = `<div class="loading-screen"><div class="spinner"></div></div>`;
@@ -406,6 +493,8 @@ function resetToSignedOut() {
 }
 
 supabase.auth.onAuthStateChange((event, session) => {
+  if (event === "PASSWORD_RECOVERY") { renderNewPassword(session?.user?.email); return; }
+  if (recovery) return;   // l'écran « nouveau mot de passe » reste tant qu'il n'est pas soumis
   if (event === "SIGNED_IN" && !store.member) { store.user = session.user; boot(); }
   if (event === "SIGNED_OUT") resetToSignedOut();
 });
@@ -447,6 +536,11 @@ document.addEventListener("click", (e) => {
       navigator.clipboard?.writeText(store.household.join_code);
       toast(T.codeCopie); return;
     case "signout": return signOut();
+    case "forgot": return forgotPassword();
+    case "cancel-reset":
+      recovery = false;
+      history.replaceState(null, "", location.pathname);
+      return supabase.auth.signOut();
   }
 });
 
@@ -454,6 +548,7 @@ document.addEventListener("click", (e) => {
 // de passe iOS/Trousseau).
 document.addEventListener("submit", (e) => {
   if (e.target && e.target.id === "auth-form") { e.preventDefault(); submitAuth(); }
+  if (e.target && e.target.id === "reset-form") { e.preventDefault(); submitReset(); }
 });
 
 // ------------------------------------------------------------------ réveil ---

@@ -653,6 +653,7 @@ body.clavier .tabbar { display: none; }
   touch-action: manipulation;
 }
 .link-btn.left { text-align: left; align-self: flex-start; }
+.form > .link-btn { align-self: center; min-height: 40px; }
 .inline.wrap { flex-wrap: wrap; }
 .prose { white-space: pre-line; overflow-wrap: anywhere; }
 .link-text { color: var(--accent-text); }

@@ -33,6 +33,20 @@ par allée (13 allées) puis par ordre alphabétique ; un catalogue québécois
 4. **Project Settings** → **API** : copier **Project URL** dans `lib/config.js`
    (la clé publique y est déjà).
 
+### Mot de passe oublié
+Le lien **« Mot de passe oublié ? »** sous le formulaire demande à Supabase
+d'envoyer un courriel avec un lien qui ramène dans l'app, sur un écran
+« Nouveau mot de passe ». C'est le seul courriel que l'app envoie ; il part de
+l'expéditeur intégré de Supabase : rien à configurer, mais environ 2 courriels
+par heure pour tout le projet. Modèle en français (facultatif) :
+**Authentication → Emails → Reset Password**, sujet « Wasabi : nouveau mot de passe » :
+```html
+<h2>Nouveau mot de passe</h2>
+<p>Quelqu'un (toi, on espère) a demandé un nouveau mot de passe pour Wasabi.</p>
+<p><a href="{{ .ConfirmationURL }}">Choisir un nouveau mot de passe</a></p>
+<p>Le lien est valable une heure. Si ce n'est pas toi, ignore ce courriel.</p>
+```
+
 ## 2. Publier
 
 Dépôt GitHub privé `jamberlouze-cat/wasabi`; Cloudflare publie à chaque `git push` :
