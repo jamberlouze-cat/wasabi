@@ -1,7 +1,7 @@
 {
   "name": "Wasabi",
   "short_name": "Wasabi",
-  "description": "L'épicerie et les recettes du foyer.",
+  "description": "Les courses et les recettes du foyer.",
   "lang": "fr-CA",
   "start_url": ".",
   "scope": ".",

@@ -14,7 +14,7 @@ Documents de référence : `FEUILLE_DE_ROUTE.md` (portée et phases),
 PDF), aperçu de lien par le Worker, images réduites sur le téléphone et gardées
 hors ligne, catégories et tags.
 
-**Épicerie (phases 1 et 2).** Listes avec emoji, articles, quantités, boîte
+**Courses (phases 1 et 2).** Listes avec emoji, articles, quantités, boîte
 d'ajout avec suggestions par fréquence et autocomplétion sur la mémoire du foyer,
 tout cocher / décocher / effacer les cochés, temps réel et hors ligne. Articles classés
 par allée (13 allées) puis par ordre alphabétique ; un catalogue québécois
@@ -79,7 +79,7 @@ app.js                  auth, foyer, onglets, réglages, temps réel, réveil
 lib/config.js           ← adresse et clé publique Supabase
 lib/supabase.js         client Supabase
 lib/store.js            couche hors ligne : copie locale + file de patchs par champ
-lib/epicerie.js         onglet Épicerie : listes, articles, boîte d'ajout collée au clavier
+lib/epicerie.js         onglet Courses : listes, articles, boîte d'ajout collée au clavier
 lib/recettes.js         onglet Recettes : grille, fiche, formulaire, visionneuse
 lib/media.js            images et PDF : compression, cache sur l'appareil, envoi différé
 lib/reglages-vues.js    Réglages > Allées, Mes articles, Catégories, Tags
