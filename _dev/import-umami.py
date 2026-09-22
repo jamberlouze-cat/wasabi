@@ -188,6 +188,8 @@ class Supabase:
         try:
             with urllib.request.urlopen(req, timeout=60) as res:
                 out = res.read()
+                if body is not None:
+                    print(f"    {req.get_method()} {path.split('?')[0]} → {res.status}")
                 return json.loads(out) if out and res.headers.get_content_type() == "application/json" else out
         except urllib.error.HTTPError as e:
             sys.exit(f"Supabase a refusé {path} : {e.code} {e.read().decode(errors='replace')[:300]}")
@@ -286,7 +288,14 @@ def ecrire(recettes):
         print(f"  {i:2d}/{len(recettes)} {r['title'][:60]}{'' if cover else '  (sans image)'}")
     sb.upsert("recipes", lignes)
     sb.upsert("recipe_tags", liens)
-    print(f"\n{len(lignes)} recettes écrites, {len(liens)} tags liés. Ferme et rouvre l'app.")
+
+    # Vérification : on relit ce qui vient d'être écrit.
+    ids = ",".join(r["id"] for r in lignes)
+    relues = sb.select("recipes", f"select=id&household_id=eq.{hh}&deleted_at=is.null&id=in.({ids})")
+    print(f"\nVérification : {len(relues)} recettes sur {len(lignes)} relues dans le foyer {hh}.")
+    if len(relues) != len(lignes):
+        sys.exit("ÉCHEC : les recettes ne sont pas dans la base. Colle cette sortie à Claude.")
+    print(f"{len(lignes)} recettes écrites, {len(liens)} tags liés. Ferme et rouvre l'app.")
 
 
 if __name__ == "__main__":
