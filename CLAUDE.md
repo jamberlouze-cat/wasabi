@@ -16,5 +16,5 @@
 - Fichiers statiques, aucun `npm`, aucune compilation (même socle que Calico et Panache).
 - Toute écriture passe par `lib/store.js` (`put`, `patch`, `remove`) : jamais d'appel Supabase direct pour les données du foyer. Un `patch` n'envoie que les champs modifiés.
 - Toute chaîne visible va dans `lib/textes.js`.
-- Après un changement à la coquille : monter `CACHE` dans `sw.js` et tenir `SHELL` à jour.
+- Après un changement à la coquille : monter `CACHE` dans `sw.js`, tenir `SHELL` à jour et monter `VERSION` dans `app.js` (correctif : x.x.+1 ; ajout : x.+1.0).
 - Vérifier au banc d'essai (`_test.html`, serveur `wasabi` de `.claude/launch.json`) avant de pousser.

@@ -2,7 +2,7 @@ import { supabase } from "./lib/supabase.js";
 import { isConfigured } from "./lib/config.js";
 import { T } from "./lib/textes.js";
 import { icon } from "./lib/icons.js";
-import { esc, toast, closeSheet, sheetIsOpen, initViewport } from "./lib/ui.js";
+import { esc, toast, closeSheet, sheetIsOpen, initViewport, naviguer } from "./lib/ui.js";
 import { renderEpicerie, showLists } from "./lib/epicerie.js";
 import { renderRecettes, showRecettesGrid, recetteFromShare } from "./lib/recettes.js";
 import { flushUploads, pendingUploads } from "./lib/media.js";
@@ -15,6 +15,9 @@ import {
 } from "./lib/store.js";
 
 // ------------------------------------------------------------------ state ---
+// Version affichée dans Réglages (majeure.mineure.correctif). À monter avec
+// CACHE dans sw.js : correctif pour des corrections, mineure pour des ajouts.
+const VERSION = "0.9.0";
 const TAB_KEY = "wasabi-onglet";
 const TABS = [
   { id: "epicerie", icone: "panier" },
@@ -134,7 +137,6 @@ function renderScreen() {
   if (screen.contains(document.activeElement) && document.activeElement.matches("input, textarea")) return;
   dock.innerHTML = "";
   screen.innerHTML = reglagesHtml();
-  showVersion();
 }
 
 // --------------------------------------------------------------- réglages ---
@@ -143,16 +145,6 @@ function syncStateText() {
   if (n) return isOffline() ? T.aEnvoyer(n) : T.envoiEnCours(n);
   if (!store.syncedAt) return T.jamaisSynchronise;
   return isOffline() ? `${T.horsLigne}${sinceText()}` : T.aJour;
-}
-
-// Numéro de la coquille en cache (CACHE de sw.js) : « Version 14 ».
-async function showVersion() {
-  const el = document.getElementById("app-version");
-  if (!el) return;
-  try {
-    const n = (await caches.keys()).map((k) => k.match(/^wasabi-v(\d+)$/)?.[1]).filter(Boolean).sort((a, b) => b - a)[0];
-    if (n) el.textContent = T.version(n);
-  } catch { /* pas de cache : rien à montrer */ }
 }
 
 function reglagesHtml() {
@@ -192,7 +184,7 @@ function reglagesHtml() {
     <section class="card">
       <div class="label">${T.synchro}</div>
       <p class="sync" id="sync-state">${esc(syncStateText())}</p>
-      <p class="help" id="app-version"></p>
+      <p class="help">${T.version(VERSION)}</p>
     </section>
 
     <button class="btn btn-block" data-act="signout">${T.seDeconnecter}</button>`;
@@ -526,6 +518,13 @@ document.addEventListener("click", (e) => {
     if (btn.dataset.tab === "recettes" && ui.tab === "recettes") {
       if (sheetIsOpen()) closeSheet();
       return showRecettesGrid();
+    }
+    if (btn.dataset.tab === "reglages" && ui.tab === "reglages") {
+      document.activeElement?.blur();
+      if (sheetIsOpen()) closeSheet();
+      const haut = () => { document.getElementById("screen").scrollTop = 0; };
+      if (!reglagesSubview()) return haut();
+      return naviguer("arriere", () => { closeReglagesSubview(); vueReglages = null; renderScreen(); haut(); });
     }
     if (btn.dataset.tab === "reglages") closeReglagesSubview();
     ui.tab = btn.dataset.tab;

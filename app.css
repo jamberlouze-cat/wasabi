@@ -323,7 +323,7 @@ input:focus {
 .list-row {
   display: flex;
   align-items: center;
-  padding-right: 4px;
+  padding-right: 10px;   /* le rond du « … » touché : même marge qu'en haut et en bas */
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -503,6 +503,11 @@ input:focus {
 .ligne { display: flex; gap: 8px; align-items: center; }
 .ligne input { flex: 1; }
 .ligne .pas button { height: 46px; }
+/* Bouton des cochés : le crochet est « découpé » dans le rond plein, de la
+   couleur du bouton (icône coches, lib/icons.js). */
+.ligne .btn-primary { --ic-fond: var(--accent); }
+.ligne .btn-primary:active { --ic-fond: var(--accent-hover); }
+.ligne .btn-primary .ic { width: 26px; height: 26px; stroke-width: 2.2; }
 
 .puces { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
 .puces::-webkit-scrollbar { display: none; }
@@ -615,23 +620,6 @@ body.clavier .tabbar { display: none; }
   color: var(--text-muted);
 }
 .tile.sans-image .tile-name { color: var(--text); background: none; }
-.tile-info {
-  position: absolute;
-  top: 4px; right: 4px;
-  width: 36px; height: 36px;
-  padding: 0;
-  appearance: none;
-  display: grid;
-  place-items: center;
-  color: var(--off-white);
-  background: none;
-  border: 0;
-  cursor: pointer;
-  touch-action: manipulation;
-}
-.tile-info .ic { width: 24px; height: 24px; padding: 2px; border-radius: 50%; background: var(--scrim); }
-.tile.sans-image .tile-info { color: var(--text-muted); }
-.tile.sans-image .tile-info .ic { background: none; }
 
 .cover { border-radius: var(--radius); overflow: hidden; background: var(--surface-2); aspect-ratio: 16 / 10; }
 .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -930,3 +918,36 @@ textarea:focus, select:focus { outline: 2px solid var(--focus-ring); outline-off
   .item-front { transition: none; }
   .spinner { animation-duration: 2s; }
 }
+
+/* ----------------------------------------------------------- navigation */
+/* Passage d'un écran à l'autre (naviguer() dans lib/ui.js), comme sur iOS :
+   en entrant, le nouvel écran arrive de la droite et l'ancien recule un peu ;
+   en revenant, l'écran quitté repart vers la droite. Seuls l'écran et le
+   bandeau d'ajout glissent : la barre d'onglets ne bouge pas. */
+#screen { view-transition-name: ecran; background: var(--bg); }   /* opaque : l'écran qui arrive cache l'autre */
+#dock { view-transition-name: dock; }
+::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+::view-transition-group(ecran), ::view-transition-group(dock) { animation-duration: 0.34s; }
+::view-transition-old(ecran), ::view-transition-new(ecran),
+::view-transition-old(dock), ::view-transition-new(dock) {
+  animation-duration: 0.34s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation-fill-mode: both;
+}
+:root[data-nav="avant"]::view-transition-new(ecran),
+:root[data-nav="avant"]::view-transition-new(dock) { animation-name: nav-de-droite; }
+:root[data-nav="avant"]::view-transition-old(ecran),
+:root[data-nav="avant"]::view-transition-old(dock) { animation-name: nav-vers-gauche; }
+:root[data-nav="arriere"]::view-transition-old(ecran),
+:root[data-nav="arriere"]::view-transition-old(dock) { animation-name: nav-vers-droite; z-index: 1; }
+:root[data-nav="arriere"]::view-transition-new(ecran),
+:root[data-nav="arriere"]::view-transition-new(dock) { animation-name: nav-de-gauche; }
+@keyframes nav-de-droite { from { transform: translateX(100%); } }
+@keyframes nav-vers-droite { to { transform: translateX(100%); } }
+@keyframes nav-vers-gauche { to { transform: translateX(-30%); opacity: 0; } }
+@keyframes nav-de-gauche { from { transform: translateX(-30%); opacity: 0; } }
+/* Sans View Transitions (vieil iOS) : le nouvel écran glisse seul. */
+.screen.nav-avant { animation: nav-de-droite-court 0.28s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.screen.nav-arriere { animation: nav-de-gauche-court 0.28s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes nav-de-droite-court { from { transform: translateX(24%); opacity: 0; } }
+@keyframes nav-de-gauche-court { from { transform: translateX(-24%); opacity: 0; } }

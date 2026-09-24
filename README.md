@@ -119,4 +119,5 @@ _test.html, _dev/       banc d'essai, faux Supabase, serveur local, générateur
 ```
 
 À chaque changement des fichiers de la coquille, monter le numéro de `CACHE`
-dans `sw.js` et tenir la liste `SHELL` à jour.
+dans `sw.js`, tenir la liste `SHELL` à jour et monter `VERSION` dans `app.js`
+(affichée dans Réglages).
