@@ -183,12 +183,17 @@ create table if not exists public.recipe_tags (
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now(),
   deleted_at   timestamptz,
-  unique (recipe_id, tag_id),
   foreign key (recipe_id, household_id)
     references public.recipes(id, household_id) on delete cascade,
   foreign key (tag_id, household_id)
     references public.tags(id, household_id) on delete cascade
 );
+
+-- Un seul lien actif par (recette, tag) ; un lien supprimé ne bloque pas son
+-- retour sous un autre identifiant (liens importés d'Umami).
+alter table public.recipe_tags drop constraint if exists recipe_tags_recipe_id_tag_id_key;
+create unique index if not exists uq_recipe_tags
+  on public.recipe_tags(recipe_id, tag_id) where deleted_at is null;
 
 -- ---------- updated_at tenu par la base -------------------------------------
 
@@ -252,6 +257,10 @@ create policy hm_select on public.household_members for select
 drop policy if exists hm_update_self on public.household_members;
 create policy hm_update_self on public.household_members for update
   using (user_id = auth.uid());
+-- Son nom et sa couleur seulement : jamais household_id (ce serait entrer dans
+-- un autre foyer sans son code) ni user_id.
+revoke update on public.household_members from anon, authenticated;
+grant update (name, color) on public.household_members to authenticated;
 
 drop policy if exists hm_delete_self on public.household_members;
 create policy hm_delete_self on public.household_members for delete
@@ -353,6 +362,10 @@ as $$
 declare v_hh uuid; v_code text;
 begin
   if auth.uid() is null then raise exception 'not authenticated'; end if;
+  -- Déjà dans un foyer (double toucher, ou second essai) : on le renvoie.
+  select household_id into v_hh from public.household_members
+    where user_id = auth.uid() order by created_at limit 1;
+  if v_hh is not null then return v_hh; end if;
   loop
     v_code := upper(substr(md5(gen_random_uuid()::text), 1, 4));
     exit when not exists (select 1 from public.households where join_code = v_code);
@@ -381,6 +394,10 @@ begin
   if auth.uid() is null then raise exception 'not authenticated'; end if;
   select id into v_hh from public.households where join_code = upper(p_code);
   if v_hh is null then raise exception 'household not found'; end if;
+  if exists (select 1 from public.household_members
+             where user_id = auth.uid() and household_id <> v_hh) then
+    raise exception 'already in another household';
+  end if;
   if (select count(*) from public.household_members where household_id = v_hh) >= 5 then
     raise exception 'household is full';
   end if;

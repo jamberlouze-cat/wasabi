@@ -5,7 +5,7 @@ import { icon } from "./lib/icons.js";
 import { esc, toast, closeSheet, sheetIsOpen, initViewport } from "./lib/ui.js";
 import { renderEpicerie, showLists } from "./lib/epicerie.js";
 import { renderRecettes, showRecettesGrid, recetteFromShare } from "./lib/recettes.js";
-import { flushUploads } from "./lib/media.js";
+import { flushUploads, pendingUploads } from "./lib/media.js";
 import {
   configureReglages, reglagesNavHtml, reglagesSubview, renderReglagesSubview, closeReglagesSubview,
 } from "./lib/reglages-vues.js";
@@ -369,29 +369,39 @@ function renderOnboarding() {
     </div>`;
 }
 
-async function createHousehold() {
-  const name = document.getElementById("ob-name").value.trim();
-  if (!name) { toast(T.entrePrenom, { type: "alerte" }); return; }
-  const { error } = await supabase.rpc("create_household", {
-    p_household_name: T.foyerParDefaut, p_member_name: name, p_color: MEMBER_COLORS[0],
-  });
-  if (error) { toast(error.message, { type: "erreur", ms: 6000 }); return; }
-  await afterMembership();
+// Un seul appel à la fois : un double toucher sur « Créer un foyer » en
+// créait deux, et le compte se retrouvait dans deux foyers.
+let onboarding = false;
+async function onboard(rpc, args, erreur) {
+  if (onboarding) return;
+  onboarding = true;
+  document.querySelectorAll(".center-screen button").forEach((b) => { b.disabled = true; });
+  try {
+    const { error } = await supabase.rpc(rpc, args);
+    if (error) { toast(erreur(error.message), { type: "erreur", ms: 6000 }); return; }
+    await afterMembership();
+  } finally {
+    onboarding = false;
+    document.querySelectorAll(".center-screen button").forEach((b) => { b.disabled = false; });
+  }
 }
 
-async function joinHousehold() {
+function createHousehold() {
+  const name = document.getElementById("ob-name").value.trim();
+  if (!name) { toast(T.entrePrenom, { type: "alerte" }); return; }
+  return onboard("create_household",
+    { p_household_name: T.foyerParDefaut, p_member_name: name, p_color: MEMBER_COLORS[0] },
+    (msg) => msg);
+}
+
+function joinHousehold() {
   const name = document.getElementById("ob-name").value.trim();
   const code = document.getElementById("ob-code").value.trim().toUpperCase();
   if (!name) { toast(T.entrePrenom, { type: "alerte" }); return; }
   if (!code) { toast(T.entreCode, { type: "alerte" }); return; }
-  const { error } = await supabase.rpc("join_household", { p_code: code, p_member_name: name, p_color: MEMBER_COLORS[1] });
-  if (error) {
-    const msg = error.message.includes("not found") ? T.codeIntrouvable
-      : error.message.includes("full") ? T.foyerPlein : error.message;
-    toast(msg, { type: "erreur", ms: 4000 });
-    return;
-  }
-  await afterMembership();
+  return onboard("join_household",
+    { p_code: code, p_member_name: name, p_color: MEMBER_COLORS[1] },
+    (msg) => msg.includes("not found") ? T.codeIntrouvable : msg.includes("full") ? T.foyerPlein : msg);
 }
 
 // --------------------------------------------------------------- lifecycle ---
@@ -401,6 +411,8 @@ async function fetchMembership() {
     .from("household_members")
     .select("*, households(*)")
     .eq("user_id", store.user.id)
+    .order("created_at")
+    .limit(1)   // un compte dans deux foyers ne doit pas bloquer le démarrage
     .maybeSingle();
   if (res.error) return null;
   if (res.data) {
@@ -533,8 +545,8 @@ document.addEventListener("click", (e) => {
     case "join-household": return joinHousehold();
     case "save-hh-name": return saveHouseholdName();
     case "copy-code":
-      navigator.clipboard?.writeText(store.household.join_code);
-      toast(T.codeCopie); return;
+      navigator.clipboard?.writeText(store.household.join_code).then(() => toast(T.codeCopie), () => {});
+      return;
     case "signout": return signOut();
     case "forgot": return forgotPassword();
     case "cancel-reset":
@@ -574,9 +586,9 @@ document.addEventListener("visibilitychange", wakeUp);
 window.addEventListener("pageshow", wakeUp);
 window.addEventListener("online", wakeUp);
 window.addEventListener("offline", () => { store.offline = true; renderBanner(); });
-// Tant qu'on est hors ligne ou qu'il reste des changements à envoyer, on
+// Tant qu'on est hors ligne ou qu'il reste des changements (ou des photos) à envoyer, on
 // retente régulièrement : l'événement « online » n'est pas fiable sur iOS.
-setInterval(() => { if (store.offline || pendingCount()) wakeUp(); }, 30000);
+setInterval(() => { if (store.offline || pendingCount() || pendingUploads()) wakeUp(); }, 30000);
 
 let vueReglages = null;
 configureReglages({

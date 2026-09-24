@@ -6,7 +6,7 @@
 //   aucun CDN à mettre en cache.
 // - Les données Supabase ne passent jamais par ici : c'est lib/store.js qui en
 //   garde une copie sur l'appareil.
-const CACHE = "wasabi-v20";
+const CACHE = "wasabi-v21";
 const MEDIA = "wasabi-media-v1";   // images et PDF des recettes (lib/media.js) : à garder
 const NETWORK_TIMEOUT_MS = 3000;
 const SHELL = [
@@ -51,7 +51,9 @@ self.addEventListener("activate", (e) => {
 async function networkFirst(request) {
   const cached = await caches.match(request, { ignoreSearch: request.mode === "navigate" });
   const network = fetch(request).then((res) => {
-    if (res.ok) {
+    // Une adresse avec paramètres (lien partagé, ?url=…) n'est pas une page de
+    // plus à garder : sans ce filtre, chaque partage ajoutait une copie en cache.
+    if (res.ok && !new URL(request.url).search) {
       const copy = res.clone();
       caches.open(CACHE).then((c) => c.put(request, copy)).catch(() => {});
     }

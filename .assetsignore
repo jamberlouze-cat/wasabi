@@ -13,6 +13,7 @@ CHARTE-COULEURS.md
 REUTILISATION.md
 schema.sql
 migration-phase2.sql
+migration-revision1.sql
 _dev
 _test.html
 .DS_Store

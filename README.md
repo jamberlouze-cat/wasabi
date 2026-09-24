@@ -108,6 +108,7 @@ manifest.webmanifest    métadonnées PWA (+ share_target pour Android)
 sw.js                   service worker (installable, coquille hors ligne)
 schema.sql              schéma complet, RLS, semis, Storage, temps réel (nouvelle installation)
 migration-phase2.sql    gabarit des 13 allées + note d'article, à passer une fois sur une base déjà installée
+migration-revision1.sql droits des membres, liens recette-tag, foyer unique par compte (relecture du 2026-09-24), à passer une fois
 catalogue.csv           catalogue d'articles (nom, synonymes séparés par « | », cle_allee) — à corriger ici
 catalogue.sql           généré par `python3 _dev/catalogue_sql.py`, à passer dans Supabase
 worker.js               waker Supabase, /_ping, habillage de l'aperçu, /api/ (aperçu de lien, image)
