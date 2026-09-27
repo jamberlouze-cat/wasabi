@@ -793,6 +793,8 @@ textarea:focus, select:focus { outline: 2px solid var(--focus-ring); outline-off
   transition: transform 0.25s ease;
 }
 .scrim.open .sheet { transform: translateY(0); }
+/* Plus haute que l'écran, la feuille défile : rien ne doit s'y écraser (le titre, en overflow: hidden, le ferait). */
+.sheet > * { flex-shrink: 0; }
 .grab { width: 40px; height: 4px; flex: none; margin: 6px auto 8px; border-radius: 4px; background: var(--border); }
 .sheet h2 { font-size: 19px; padding: 0 2px 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .form-sheet { display: flex; flex-direction: column; gap: 14px; margin-bottom: 6px; }
