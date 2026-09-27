@@ -17,7 +17,7 @@ import {
 // ------------------------------------------------------------------ state ---
 // Version affichée dans Réglages (majeure.mineure.correctif). À monter avec
 // CACHE dans sw.js : correctif pour des corrections, mineure pour des ajouts.
-const VERSION = "0.9.0";
+const VERSION = "0.10.0";
 const TAB_KEY = "wasabi-onglet";
 const TABS = [
   { id: "epicerie", icone: "panier" },

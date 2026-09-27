@@ -817,6 +817,7 @@ textarea:focus, select:focus { outline: 2px solid var(--focus-ring); outline-off
 .menu-item[aria-pressed="true"] { border-color: var(--focus-ring); background: var(--tag-bg); }
 .menu-item .grow + .ic { color: var(--accent-text); }
 .aisle-choices { display: flex; flex-direction: column; gap: 6px; }
+.menu-item .emoji-pill { width: 32px; height: 32px; font-size: 18px; margin-left: -6px; }
 .btn-danger .ic { width: 20px; height: 20px; }
 
 .emoji-input {
