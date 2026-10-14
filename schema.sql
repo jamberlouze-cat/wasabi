@@ -152,11 +152,15 @@ create table if not exists public.recipes (
   site_name        text,   -- type 'url'
   ingredients_text text,   -- type 'manual'
   steps_text       text,   -- type 'manual'
+  menu_count       int  not null default 0,   -- pastilles du Menu
+  last_menu_at     timestamptz,
   created_at       timestamptz not null default now(),
   updated_at       timestamptz not null default now(),
   deleted_at       timestamptz,
   unique (id, household_id)
 );
+alter table public.recipes add column if not exists menu_count   int not null default 0;
+alter table public.recipes add column if not exists last_menu_at timestamptz;
 create index if not exists idx_recipes_hh on public.recipes(household_id);
 
 -- Fichiers d'une recette de type 'file' (ex. une recette sur deux pages).
@@ -195,6 +199,24 @@ alter table public.recipe_tags drop constraint if exists recipe_tags_recipe_id_t
 create unique index if not exists uq_recipe_tags
   on public.recipe_tags(recipe_id, tag_id) where deleted_at is null;
 
+-- ---------- Menu de la semaine ---------------------------------------------
+-- Une simple liste de repas, sans jour ni date. Un repas est une recette du
+-- carnet (recipe_id) ou un texte libre ; title est dénormalisé pour
+-- l'affichage hors ligne et pour les repas sans recette.
+create table if not exists public.menu_items (
+  id           uuid primary key default gen_random_uuid(),
+  household_id uuid not null references public.households(id) on delete cascade,
+  recipe_id    uuid,
+  title        text not null,
+  done         boolean not null default false,   -- repas fait
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now(),
+  deleted_at   timestamptz,
+  foreign key (recipe_id, household_id)
+    references public.recipes(id, household_id) on delete cascade
+);
+create index if not exists idx_menu_items_hh on public.menu_items(household_id);
+
 -- ---------- updated_at tenu par la base -------------------------------------
 
 create or replace function public.touch_updated_at()
@@ -213,7 +235,7 @@ begin
   foreach t in array array[
     'households','household_members','aisles','catalog_items','household_items',
     'grocery_lists','list_items','recipe_categories','tags','recipes',
-    'recipe_files','recipe_tags'
+    'recipe_files','recipe_tags','menu_items'
   ] loop
     execute format('drop trigger if exists trg_touch on public.%I', t);
     execute format(
@@ -277,7 +299,7 @@ declare t text;
 begin
   foreach t in array array[
     'aisles','household_items','grocery_lists','list_items',
-    'recipe_categories','tags','recipes','recipe_files','recipe_tags'
+    'recipe_categories','tags','recipes','recipe_files','recipe_tags','menu_items'
   ] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('drop policy if exists hh_all on public.%I', t);
@@ -439,7 +461,8 @@ declare t text;
 begin
   foreach t in array array[
     'households','household_members','aisles','household_items','grocery_lists',
-    'list_items','recipe_categories','tags','recipes','recipe_files','recipe_tags'
+    'list_items','recipe_categories','tags','recipes','recipe_files','recipe_tags',
+    'menu_items'
   ] loop
     begin
       execute format('alter publication supabase_realtime add table public.%I', t);

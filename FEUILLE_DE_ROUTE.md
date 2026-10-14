@@ -44,7 +44,7 @@ Reprendre le même socle que **Calico** et **Panache** :
 
 ### Exclu
 
-Import intelligent de recettes, mode cuisine, minuteries, mise à l'échelle des portions, évaluations, planification des repas, lien recette → épicerie, intégration Rappels iOS, liens publics de partage, extension de navigateur, multilingue, abonnement.
+Import intelligent de recettes, mode cuisine, minuteries, mise à l'échelle des portions, évaluations, planification des repas par jour (un menu de la semaine sans jour ni date a été ajouté le 2026-10-14), lien recette → épicerie, intégration Rappels iOS, liens publics de partage, extension de navigateur, multilingue, abonnement.
 
 ### Plus tard
 
@@ -114,7 +114,7 @@ Compartiment privé `recipe-media`, chemins préfixés par `household_id`, accè
 ## 6. Spécification fonctionnelle
 
 ### Navigation
-Barre d'onglets en bas : **Épicerie** · **Recettes** · **Réglages**. L'app ouvre sur Épicerie, directement sur la dernière liste consultée.
+Barre d'onglets en bas : **Épicerie** (« Courses ») · **Menu** · **Recettes** · **Réglages**. Le Menu (ajout du 2026-10-14) est une simple liste de repas de la semaine, sans jour ni date : une recette du carnet ou un texte libre, cochée une fois faite. L'app ouvre sur Épicerie, directement sur la dernière liste consultée.
 
 ### 6.1 Épicerie
 

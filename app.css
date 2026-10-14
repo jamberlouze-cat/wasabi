@@ -291,7 +291,7 @@ input:focus {
 .empty-icon .ic { width: 32px; height: 32px; }
 
 /* ------------------------------------------------------------- épicerie */
-#ep { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+#ep, #mn { display: flex; flex-direction: column; gap: 12px; flex: 1; }
 
 .icon-btn {
   width: 44px; height: 44px;
@@ -552,6 +552,28 @@ input:focus {
 .completion:active { background: var(--tag-bg); }
 /* Clavier ouvert ou champ d'ajout actif : la barre d'onglets se cache. */
 body.clavier .tabbar { display: none; }
+
+/* ----------------------------------------------------------------- menu */
+/* Un repas = une ligne de Courses ; s'il vient du carnet, sa vignette (à
+   droite) ouvre la fiche de la recette. */
+.mn-vignette {
+  width: 44px; height: 44px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  overflow: hidden;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.mn-vignette img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mn-vignette img:not([src]) { visibility: hidden; }
+.mn-vignette .ic { width: 20px; height: 20px; }
+.item.checked .mn-vignette { opacity: 0.5; }
 
 /* ------------------------------------------------------------- recettes */
 .btn.round { border-radius: 50%; }
@@ -862,7 +884,7 @@ textarea:focus, select:focus { outline: 2px solid var(--focus-ring); outline-off
 }
 .tab {
   flex: 1;
-  max-width: calc(var(--col) / 3);
+  max-width: calc(var(--col) / 4);
   height: var(--tabbar-h);
   position: relative;
   display: flex;

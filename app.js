@@ -5,22 +5,24 @@ import { icon } from "./lib/icons.js";
 import { esc, toast, closeSheet, sheetIsOpen, initViewport, naviguer } from "./lib/ui.js";
 import { renderEpicerie, showLists } from "./lib/epicerie.js";
 import { renderRecettes, showRecettesGrid, recetteFromShare } from "./lib/recettes.js";
+import { renderMenu, showMenuList } from "./lib/menu.js";
 import { flushUploads, pendingUploads } from "./lib/media.js";
 import {
   configureReglages, reglagesNavHtml, reglagesSubview, renderReglagesSubview, closeReglagesSubview,
 } from "./lib/reglages-vues.js";
 import {
   store, restoreCache, clearOfflineData, pull, flush, patch, applyRemote,
-  pendingCount, isOffline, on as onStore,
+  pendingCount, isOffline, tablesAbsentes, on as onStore,
 } from "./lib/store.js";
 
 // ------------------------------------------------------------------ state ---
 // Version affichée dans Réglages (majeure.mineure.correctif). À monter avec
 // CACHE dans sw.js : correctif pour des corrections, mineure pour des ajouts.
-const VERSION = "0.10.1";
+const VERSION = "0.11.0";
 const TAB_KEY = "wasabi-onglet";
 const TABS = [
   { id: "epicerie", icone: "panier" },
+  { id: "menu", icone: "couverts" },
   { id: "recettes", icone: "livre" },
   { id: "reglages", icone: "reglages" },
 ];
@@ -83,7 +85,7 @@ function scheduleReload() {
 // Tables de données : la ligne reçue est appliquée telle quelle (pas de
 // rechargement complet à chaque coche).
 const REALTIME_TABLES = ["grocery_lists", "list_items", "household_items", "aisles",
-  "recipes", "recipe_files", "recipe_tags", "tags", "recipe_categories"];
+  "recipes", "recipe_files", "recipe_tags", "tags", "recipe_categories", "menu_items"];
 let renderTimer = null;
 function onRemoteRow(table, payload) {
   applyRemote(table, payload.new);
@@ -98,7 +100,9 @@ function subscribeRealtime() {
   channel = supabase.channel("hh-" + hid)
     .on("postgres_changes", { event: "*", schema: "public", table: "households", filter: `id=eq.${hid}` }, scheduleReload)
     .on("postgres_changes", { event: "*", schema: "public", table: "household_members", filter: `household_id=eq.${hid}` }, scheduleReload);
-  for (const table of REALTIME_TABLES) {
+  // Une table pas encore créée dans Supabase (migration à passer) ferait
+  // échouer tout le canal : on ne l'écoute pas.
+  for (const table of REALTIME_TABLES.filter((t) => !tablesAbsentes.has(t))) {
     channel.on("postgres_changes", { event: "*", schema: "public", table, filter: `household_id=eq.${hid}` },
       (payload) => onRemoteRow(table, payload));
   }
@@ -131,6 +135,7 @@ function renderScreen() {
   // L'épicerie se met à jour par morceaux (le champ d'ajout garde le focus).
   const dock = document.getElementById("dock");
   if (ui.tab === "epicerie") { renderEpicerie(screen, dock); return; }
+  if (ui.tab === "menu") { renderMenu(screen, dock); return; }
   if (ui.tab === "recettes") { dock.innerHTML = ""; renderRecettes(screen); return; }
   if (ui.tab === "reglages" && reglagesSubview()) { dock.innerHTML = ""; renderReglagesSubview(screen); return; }
   // Ne pas reconstruire un écran où l'on est en train d'écrire.
@@ -514,6 +519,11 @@ document.addEventListener("click", (e) => {
       document.activeElement?.blur();
       if (sheetIsOpen()) closeSheet();
       return showLists();
+    }
+    if (btn.dataset.tab === "menu" && ui.tab === "menu") {
+      document.activeElement?.blur();
+      if (sheetIsOpen()) closeSheet();
+      return showMenuList();
     }
     if (btn.dataset.tab === "recettes" && ui.tab === "recettes") {
       if (sheetIsOpen()) closeSheet();

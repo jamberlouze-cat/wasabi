@@ -48,6 +48,10 @@ const db = {
     { id: "r2", household_id: "hh1", type: "manual", title: "Soupe aux pois de grand-maman", category_id: "rcat0", cover_path: null, ingredients_text: "2 tasses de pois jaunes\n1 os de jambon\n1 oignon", steps_text: "Faire tremper les pois toute la nuit.\nMijoter 3 heures.", notes: null, deleted_at: null, created_at: "2026-09-11T10:00:00Z" },
   ],
   recipe_files: [],
+  menu_items: [
+    { id: "mi1", household_id: "hh1", recipe_id: "r1", title: "Pâté chinois classique", done: false, deleted_at: null, created_at: "2026-10-12T10:00:00Z" },
+    { id: "mi2", household_id: "hh1", recipe_id: null, title: "Tacos", done: true, deleted_at: null, created_at: "2026-10-12T10:00:01Z" },
+  ],
   recipe_tags: [{ id: "rt1", household_id: "hh1", recipe_id: "r1", tag_id: "t1", deleted_at: null, created_at: now() }],
 };
 if (SCENARIO === "onboard") db.household_members = db.household_members.filter((m) => m.user_id !== "u1");
