@@ -150,8 +150,8 @@ create table if not exists public.recipes (
   notes            text,   -- tous les types
   url              text,   -- type 'url'
   site_name        text,   -- type 'url'
-  ingredients_text text,   -- type 'manual'
-  steps_text       text,   -- type 'manual'
+  ingredients_text text,   -- types 'manual' et 'url' (prérempli depuis le site)
+  steps_text       text,   -- types 'manual' et 'url'
   menu_count       int  not null default 0,   -- pastilles du Menu
   last_menu_at     timestamptz,
   created_at       timestamptz not null default now(),

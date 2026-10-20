@@ -8,7 +8,7 @@
 App maison pour deux utilisateurs (Maxime et sa conjointe), qui remplace Umami. On ne reproduit pas Umami : on garde ce qui sert vraiment au quotidien et on simplifie le reste.
 
 - **Cœur de l'app : les listes d'épicerie.** Usage hebdomadaire, à deux, souvent en magasin avec un mauvais réseau.
-- **Recettes : un carnet de signets visuel.** Des tuiles avec photo qui mènent à un lien, à une fiche simple ou à une photo/PDF. Aucune fiche standardisée, aucun import intelligent.
+- **Recettes : un carnet de signets visuel.** Des tuiles avec photo qui mènent à un lien, à une fiche simple ou à une photo/PDF. Aucune fiche standardisée, aucun import par IA. Seule exception (ajout du 2026-10-19) : à l'ajout d'un lien, les ingrédients et les étapes sont repris tels quels quand le site les publie en données structurées.
 
 ## 2. Principes directeurs
 
@@ -38,17 +38,19 @@ Reprendre le même socle que **Calico** et **Panache** :
 | Module | Fonctionnalités |
 |---|---|
 | Épicerie | Listes multiples avec emoji; quantité par article (− / +); boîte d'ajout en bas avec suggestions par fréquence; mémoire des articles; tri par allée (catalogue québécois); ordre des allées personnalisable; tout cocher / tout décocher / effacer les cochés; synchro temps réel; hors ligne |
-| Recettes | Un seul livre; page en tuiles (photo + nom); trois types (URL, manuelle, photo/PDF); vignette automatique pour les URL; notes sur toutes les recettes; catégories; tags; recherche et filtres |
+| Recettes | Un seul livre; page en tuiles (photo + nom); trois types (URL, manuelle, photo/PDF); vignette automatique pour les URL; ingrédients et étapes repris du site quand il les publie (URL); ingrédients envoyés à une liste d'épicerie; notes sur toutes les recettes; catégories; tags; recherche et filtres |
 | Transversal | Comptes individuels; foyer partagé; PWA |
 | Migration | Script unique d'import de l'export Umami |
 
 ### Exclu
 
-Import intelligent de recettes, mode cuisine, minuteries, mise à l'échelle des portions, évaluations, planification des repas par jour (un menu de la semaine sans jour ni date a été ajouté le 2026-10-14), lien recette → épicerie, intégration Rappels iOS, liens publics de partage, extension de navigateur, multilingue, abonnement.
+Import de recettes par IA (la lecture des données structurées publiées par les sites a été ajoutée le 2026-10-19, voir § 6.2), mode cuisine, minuteries, mise à l'échelle des portions, évaluations, planification des repas par jour (un menu de la semaine sans jour ni date a été ajouté le 2026-10-14), intégration Rappels iOS, liens publics de partage, extension de navigateur, multilingue, abonnement.
 
 ### Plus tard
 
 Export / sauvegarde des données.
+
+Repli par IA pour les pages sans données structurées (blogues, sites maison) : le Worker enverrait le texte de la page nettoyé à l'API Claude et recevrait ingrédients et étapes dans un format imposé. Estimation du 2026-10-18, en dollars américains : de 0,15 ¢ (Haiku 5.5) à 6 ¢ (Opus 5.5) par recette, donc quelques sous à 1 $ par mois au rythme d'un foyer. Demande un compte API Anthropic à crédits prépayés et une clé en secret Cloudflare. Ne règle pas les sites qui bloquent les serveurs (Allrecipes, Serious Eats…) ni les recettes en vidéo (Instagram, Facebook).
 
 ## 5. Modèle de données
 
@@ -101,7 +103,7 @@ Semées par défaut : Entrée, Soupe, Salade, Plat principal, Accompagnement, De
 - `cover_path` (image de la tuile, dans Storage)
 - `notes` (texte libre, **tous les types**)
 - Type `url` : `url`, `site_name`
-- Type `manual` : `ingredients_text`, `steps_text` (texte libre, sauts de ligne conservés)
+- Types `manual` et `url` : `ingredients_text`, `steps_text` (texte libre, sauts de ligne conservés; pour un lien, prérempli depuis le site quand c'est possible)
 
 **`recipe_files`** — pour le type `file`; plusieurs fichiers possibles (ex. une recette sur deux pages)
 - `id`, `recipe_id`, `path`, `mime_type`, `position`
@@ -152,15 +154,23 @@ Barre d'onglets en bas : **Épicerie** (« Courses ») · **Menu** · **Recettes
 - Type `file` : ouvre la visionneuse (images avec zoom par pincement et défilement entre les pages; PDF dans une visionneuse intégrée).
 
 **Ajout d'une recette.** Bouton « + », puis choix du type.
-- **Lien :** le bouton « Coller » lit le presse-papier (voir contraintes iOS); repli sur un champ de texte. Dès qu'une URL valide est saisie, appeler l'aperçu de lien (ci-dessous) pour préremplir le titre et l'image. Tout reste modifiable. Puis catégorie, tags, notes.
+- **Lien :** le bouton « Coller » lit le presse-papier (voir contraintes iOS); repli sur un champ de texte. Dès qu'une URL valide est saisie, appeler l'aperçu de lien (ci-dessous) pour préremplir le titre, l'image, les ingrédients et les étapes (seulement les champs encore vides). Tout reste modifiable. Puis catégorie, tags, notes.
 - **Manuelle :** titre, photo (facultative), ingrédients, étapes, notes, catégorie, tags.
 - **Photo / PDF :** prendre une photo, choisir dans la photothèque ou choisir un fichier. Plusieurs fichiers possibles. Titre obligatoire. La première image sert de tuile par défaut; pour un PDF, générer une vignette de la première page si c'est simple, sinon tuile générique.
 
 **Aperçu de lien (seul service serveur de l'app).** Point d'accès sur Cloudflare Worker : reçoit une URL, retourne `title`, `image`, `site_name` tirés des balises Open Graph (repli sur `<title>`).
+- Retourne aussi `ingredients` et `steps` (ajout du 2026-10-19) tirés de la fiche schema.org `Recipe` que la plupart des sites de recettes publient pour les moteurs de recherche : bloc JSON-LD (Ricardo, Mordu, Marmiton, BBC Good Food, blogues WordPress…), sinon attributs microdata (Trois fois par jour). Aucune IA : sans fiche, des chaînes vides. Même format que la migration d'Umami : un ingrédient par ligne, étapes numérotées, titres de sections seulement s'il y en a plusieurs.
 - Exiger un jeton Supabase valide.
 - Accepter seulement `http`/`https`; bloquer les adresses privées et locales (protection SSRF); délai maximal de 5 s; taille de réponse plafonnée.
 - **Copier l'image dans Storage** plutôt que de pointer vers le site d'origine (les liens d'images meurent et plusieurs sites bloquent l'affichage externe).
 - En cas d'échec : ne jamais bloquer l'ajout, l'utilisateur complète à la main.
+
+**Ingrédients → épicerie (ajout du 2026-10-19).** Sur la fiche (aussi ouverte depuis le Menu), les ingrédients s'affichent en liste, une ligne par ingrédient, et un bouton « Ajouter à l'épicerie » ouvre une feuille :
+- Chaque ligne devient un article, sans quantité ni préparation : « 375 ml (1 ½ tasse) de bouillon de bœuf » → « Bouillon de bœuf », la quantité allant dans la note de l'article (un simple nombre, « 2 poivrons », va dans la quantité). « Sel et poivre » donne deux articles. Un intertitre (« Pour la sauce : ») reste un intertitre. Code : `lib/ingredients.js` (analyse) et `lib/epicerie.js` (rattachement).
+- Rattachement, dans l'ordre : un article déjà dans la mémoire du foyer (au pluriel près : « 1 oignon » → « Oignons »); un article du catalogue (le mot du foyer s'il le connaît déjà, comme « Patates »); sinon le mot de la recette, rangé dans l'allée de l'article du catalogue qui le commence (« Bouillon de bœuf » → allée de « Bouillon »), ou « Autre ».
+- Tout est coché d'avance, sauf ce qui est déjà dans la liste (grisé). On décoche ce qu'on a à la maison, puis un seul bouton « Ajouter N articles ». Liste proposée : la dernière ouverte; un menu déroulant si le foyer en a plusieurs.
+- Même règle que la boîte d'ajout : un article déjà présent et pas coché n'est jamais doublé; coché, il est décoché.
+- À valider à l'usage : tout cocher d'avance plutôt que rien; la quantité de la recette dans la note.
 
 **Réglages > Catégories et tags.** Ajouter, renommer, réordonner (catégories), supprimer.
 

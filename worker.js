@@ -8,7 +8,8 @@
 //   2. l'adresse /_ping, qui déclenche la même visite à la main pour vérifier ;
 //   3. sur l'aperçu (dev-wasabi…), une icône inversée et le nom « Wasabi DEV »,
 //      pour distinguer les deux apps sur l'écran d'accueil de l'iPhone ;
-//   4. /api/ : l'aperçu de lien des recettes (voir plus bas).
+//   4. /api/ : l'aperçu de lien des recettes, avec ingrédients et étapes quand
+//      le site les publie (voir plus bas).
 //
 // Les requêtes du ping sont minuscules : elles demandent un identifiant dans
 // trois tables avec la clé publique, et les règles de sécurité (RLS) répondent
@@ -37,6 +38,7 @@ async function pingSupabase() {
 // Seul service serveur de l'app (feuille de route § 6.2). Deux adresses, toutes
 // deux réservées aux comptes connectés (jeton Supabase valide) :
 //   POST /api/apercu-lien  { url }  →  { title, image, site_name }  (balises Open Graph)
+//                                       + { ingredients, steps }   (fiche schema.org Recipe)
 //   POST /api/image        { url }  →  les octets de l'image (le téléphone la
 //                                       réduit puis la range dans Storage : les
 //                                       liens d'images meurent, et plusieurs
@@ -99,7 +101,7 @@ async function telecharger(href, accept, max) {
       if (total + value.length > max) {
         await reader.cancel();
         if (accept.startsWith("image")) return null;       // image trop lourde : on renonce
-        morceaux.push(value.subarray(0, max - total));     // page : le <head> suffit
+        morceaux.push(value.subarray(0, max - total));     // page : l'aperçu et la recette sont presque toujours avant
         total = max;
         break;
       }
@@ -145,6 +147,120 @@ export function extraireApercu(html, base) {
   };
 }
 
+// ------------------------------------------------------ fiche de recette ---
+// La plupart des sites de recettes publient la recette en données structurées
+// pour les moteurs de recherche (schema.org Recipe, dans un
+// <script type="application/ld+json">, ou en attributs itemprop dans le HTML) :
+// ingrédients et étapes s'y lisent tels quels, sans IA. Pas de fiche Recipe :
+// chaînes vides, la personne complète à la main. Même format que les recettes
+// importées d'Umami : un ingrédient par ligne, des étapes numérotées.
+
+const MAX_TEXTE = 10000;   // par champ
+
+// Une valeur schema.org en lignes de texte : balises retirées, entités décodées.
+const lignes = (s) => String(s ?? "")
+  .replace(/<br\s*\/?>|<\/(p|li|div|h\d)>/gi, "\n")
+  .replace(/<[^>]+>/g, " ")
+  .split("\n").map(decoder).filter(Boolean);
+
+function blocsJsonLd(html) {
+  const blocs = [];
+  for (const m of html.matchAll(/<script\b[^>]*application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) {
+    const brut = m[1].trim().replace(/^<!\[CDATA\[|\]\]>$/g, "");
+    try { blocs.push(JSON.parse(brut)); } catch {
+      // Sauts de ligne bruts dans les chaînes : JSON invalide, mais fréquent.
+      try { blocs.push(JSON.parse(brut.replace(/[\u0000-\u001f]+/g, " "))); } catch { /* bloc illisible */ }
+    }
+  }
+  return blocs;
+}
+
+const estDeType = (noeud, type) => [].concat(noeud?.["@type"] || [])
+  .some((t) => new RegExp(`(^|[/:])${type}$`, "i").test(String(t)));
+
+// La recette peut être seule, dans une liste, dans un @graph (Yoast) ou
+// rattachée à la page (mainEntity).
+function trouverRecette(noeud, profondeur = 0) {
+  if (!noeud || typeof noeud !== "object" || profondeur > 6) return null;
+  if (Array.isArray(noeud)) {
+    for (const n of noeud) { const r = trouverRecette(n, profondeur + 1); if (r) return r; }
+    return null;
+  }
+  if (estDeType(noeud, "Recipe")) return noeud;
+  for (const cle of ["@graph", "mainEntity", "itemListElement", "item"]) {
+    const r = trouverRecette(noeud[cle], profondeur + 1);
+    if (r) return r;
+  }
+  return null;
+}
+
+// recipeInstructions : un texte, une liste de textes, de HowToStep, ou de
+// HowToSection (« Sauce », « Montage »…) qui contiennent des HowToStep.
+// Les intertitres seuls (« Étapes », « Étape 2 », « Préparation ») sont écartés.
+const INTERTITRE = /^(étapes?|préparation|instructions?|méthode|steps?|method|directions?)(\s*\d+)?\s*:?$/i;
+function lireEtapes(valeur, sortie = [], profondeur = 0) {
+  if (valeur == null || profondeur > 5) return sortie;
+  if (typeof valeur === "string") {
+    for (const t of lignes(valeur)) if (!INTERTITRE.test(t)) sortie.push({ texte: t });
+  } else if (Array.isArray(valeur)) {
+    for (const v of valeur) lireEtapes(v, sortie, profondeur + 1);
+  } else if (typeof valeur === "object") {
+    if (estDeType(valeur, "HowToSection") || (valeur.itemListElement && !valeur.text)) {
+      const nom = lignes(valeur.name).join(" ");
+      if (nom) sortie.push({ section: nom });
+      lireEtapes(valeur.itemListElement, sortie, profondeur + 1);
+    } else {
+      const t = lignes(valeur.text || valeur.name || valeur.description).join(" ");
+      if (t && !INTERTITRE.test(t)) sortie.push({ texte: t });
+    }
+  }
+  return sortie;
+}
+
+// Microdata : le contenu HTML de chaque élément itemprop="…" (ou son attribut
+// content), jusqu'à sa balise fermante, imbrications du même nom comptées.
+// Moins courant que le JSON-LD, mais c'est le format de Trois fois par jour.
+function itemprops(html, noms) {
+  const valeurs = [];
+  for (const m of html.matchAll(new RegExp(`<(\\w+)\\b[^>]*\\bitemprop=["']?(?:${noms})\\b[^>]*>`, "gi"))) {
+    const attr = m[0].match(/\bcontent=(?:"([^"]*)"|'([^']*)')/i);
+    if (attr) { valeurs.push(attr[1] ?? attr[2]); continue; }
+    const debut = m.index + m[0].length;
+    const balises = new RegExp(`<(/?)${m[1]}\\b[^>]*>`, "gi");
+    balises.lastIndex = debut;
+    for (let niveau = 1, b; (b = balises.exec(html)) && b.index - debut < MAX_TEXTE;) {
+      niveau += b[1] ? -1 : 1;
+      if (!niveau) { valeurs.push(html.slice(debut, b.index)); break; }
+    }
+  }
+  return valeurs;
+}
+
+/** Ingrédients et étapes de la fiche schema.org Recipe de la page ("" si absente). */
+export function extraireRecette(html) {
+  let recette = null;
+  for (const bloc of blocsJsonLd(html)) if ((recette = trouverRecette(bloc))) break;
+  recette ||= {
+    recipeIngredient: itemprops(html, "recipeIngredient|ingredients"),
+    recipeInstructions: itemprops(html, "recipeInstructions"),
+  };
+
+  const ingredients = [].concat(recette.recipeIngredient || recette.ingredients || [])
+    .flatMap((x) => lignes(typeof x === "string" ? x : x?.name || x?.text));
+  const liste = lireEtapes(recette.recipeInstructions);
+  // Une seule section porte d'habitude le nom de la recette : on ne la montre pas.
+  const sections = liste.filter((e) => e.section).length > 1;
+  let n = 0;
+  const steps = liste.filter((e) => sections || !e.section).map((e, i) => e.section
+    ? `${i ? "\n" : ""}${e.section}`
+    // Étapes déjà numérotées par le site : on renumérote.
+    : `${++n}. ${e.texte.replace(/^(?:étape\s*)?\d+\s*[.):–-]\s*/i, "")}`);
+  return {
+    ingredients: ingredients.join("\n").slice(0, MAX_TEXTE),
+    steps: steps.join("\n").slice(0, MAX_TEXTE),
+  };
+}
+
 async function compteValide(request) {
   const auth = request.headers.get("authorization") || "";
   if (!/^Bearer \S+/.test(auth)) return false;
@@ -163,7 +279,8 @@ async function api(request, pathname) {
     if (pathname === "/api/apercu-lien") {
       const page = await telecharger(url, "text/html,application/xhtml+xml", MAX_HTML);
       if (!page) return json({ error: "page-inaccessible" }, 502);
-      return json(extraireApercu(new TextDecoder("utf-8").decode(page.octets), page.url.href));
+      const html = new TextDecoder("utf-8").decode(page.octets);
+      return json({ ...extraireApercu(html, page.url.href), ...extraireRecette(html) });
     }
     if (pathname === "/api/image") {
       const img = await telecharger(url, "image/avif,image/webp,image/*;q=0.8", MAX_IMAGE);
