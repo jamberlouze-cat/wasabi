@@ -6,7 +6,7 @@
   --radius: 14px;
   --radius-sm: 10px;
   --tabbar-h: 50px;
-  --col: 560px;   /* à l'ordinateur : l'interface mobile centrée dans une colonne */
+  --col: 560px;   /* fenêtre moyenne : l'interface mobile centrée dans une colonne (large : § ordinateur) */
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 
@@ -154,6 +154,7 @@ input:focus {
   touch-action: manipulation;
 }
 .btn:active { background: var(--surface-2); }
+a.btn { text-decoration: none; }
 .btn:disabled { color: var(--text-disabled); cursor: default; }
 .btn-block { width: 100%; }
 .btn-icon { width: 48px; padding: 0; flex: none; }
@@ -239,7 +240,7 @@ input:focus {
   user-select: all;
 }
 
-.nav-card { padding: 0 14px; gap: 0; }
+.nav-card { padding: 0 14px; gap: 0; overflow: hidden; }
 .nav-row, .row-btn {
   width: 100%;
   min-height: 52px;
@@ -1005,3 +1006,337 @@ textarea:focus, select:focus { outline: 2px solid var(--focus-ring); outline-off
 .screen.nav-arriere { animation: nav-de-gauche-court 0.28s cubic-bezier(0.2, 0.8, 0.2, 1); }
 @keyframes nav-de-droite-court { from { transform: translateX(24%); opacity: 0; } }
 @keyframes nav-de-gauche-court { from { transform: translateX(-24%); opacity: 0; } }
+
+/* ---------------------------------------------------------------- fiche */
+/* Fiche d'une recette : deux blocs (photo, actions et ingrédients ; étapes et
+   notes). L'un sous l'autre au téléphone ; côte à côte dès que la fiche a
+   760 px devant elle (écran de l'ordinateur, mais pas le volet étroit du Menu). */
+.fiche, .fiche-colonnes, .fiche-cote, .fiche-corps { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.fiche { container-type: inline-size; }
+@container (min-width: 760px) {
+  .fiche-colonnes:has(> .fiche-corps) {
+    display: grid;
+    grid-template-columns: minmax(300px, 2fr) 3fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .fiche-colonnes:not(:has(> .fiche-corps)) { max-width: 560px; }
+}
+
+/* -------------------------------------------------------------- cuisine */
+/* Mode Cuisine (lib/cuisine.js) : par-dessus toute l'app, texte en grand.
+   Ingrédients et étapes en deux onglets ; côte à côte à partir de 800 px. */
+.cuisine {
+  --cu-taille: 1;
+  position: fixed;
+  left: 0; right: 0;
+  top: var(--vv-top, 0px);
+  height: var(--vv-h, 100dvh);
+  z-index: 55;
+  display: flex;
+  flex-direction: column;
+  color: var(--text);
+  background: var(--bg);
+}
+.cuisine[hidden] { display: none; }
+.cu-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: calc(6px + env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) 6px max(8px, env(safe-area-inset-left));
+  border-bottom: 1px solid var(--border);
+}
+.cu-bar h1 {
+  flex: 1;
+  min-width: 0;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cu-aa { display: inline-flex; align-items: center; justify-content: center; gap: 1px; font-size: 18px; font-weight: 700; color: var(--text); }
+.cu-aa small { font-size: 15px; }
+.cu-aa:disabled { color: var(--text-disabled); cursor: default; }
+/* Pastille « écran gardé allumé » : aux couleurs d'un tag quand le verrou est tenu. */
+.cu-eveil {
+  flex: none;
+  height: 30px;
+  margin: 0 4px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text-disabled);
+  background: var(--surface-2);
+  border-radius: 15px;
+}
+.cu-eveil.actif { color: var(--tag-text); background: var(--tag-bg); }
+.cu-eveil .ic { width: 18px; height: 18px; }
+.cu-eveil span { display: none; }
+
+.cu-onglets {
+  flex: none;
+  display: flex;
+  gap: 4px;
+  margin: 10px max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+  padding: 4px;
+  background: var(--surface-2);
+  border-radius: 12px;
+}
+.cu-onglets button {
+  flex: 1;
+  min-height: 40px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.cu-onglets button[aria-selected="true"] { color: var(--text); background: var(--surface); border-color: var(--border); }
+
+.cu-corps { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); }
+.cu-volet {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px max(16px, env(safe-area-inset-right)) calc(32px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  font-size: calc(19px * var(--cu-taille));
+  line-height: 1.45;
+}
+.cu-volet > .label:first-child { display: none; }   /* l'onglet le dit déjà */
+.cu-volet > .label { margin: 1.8em 0 6px; }
+.cu-liste { list-style: none; margin: 0; padding: 0; }
+.cu-titre { padding: 1.1em 2px 0.35em; font-size: 0.8em; font-weight: 700; color: var(--text-muted); }
+.cu-titre:first-child { padding-top: 0.2em; }
+.cu-ing, .cu-etape {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7em;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  overflow-wrap: anywhere;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.cu-ing { padding: 0.5em 2px; }
+.cu-liste li + li .cu-ing { border-top: 1px solid var(--border); }
+.cu-ing .case { margin-top: 0.12em; }
+.cu-ing[aria-pressed="true"] { color: var(--text-disabled); text-decoration: line-through; }
+.cu-ing[aria-pressed="true"] .case { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+/* Étape en cours : sur une carte, son numéro en Wasabi ; les précédentes s'estompent. */
+.cu-etape { padding: 0.6em 0.65em; border: 1px solid transparent; border-radius: var(--radius); }
+.cu-no {
+  width: 1.75em; height: 1.75em;
+  flex: none;
+  display: grid;
+  place-items: center;
+  font-size: 0.85em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border-radius: 50%;
+}
+.cu-etape[aria-current="step"] { background: var(--surface); border-color: var(--border); }
+.cu-etape[aria-current="step"] .cu-no { color: var(--on-accent); background: var(--accent); }
+.cu-etape.faite { color: var(--text-disabled); }
+.cu-etape.faite .cu-no { color: var(--text-disabled); }
+.cu-vide { color: var(--text-muted); }
+.cu-volet .btn { margin-top: 14px; font-size: 16px; text-decoration: none; }
+
+@media (max-width: 799px) {
+  .cuisine[data-volet="ingredients"] #cu-etapes,
+  .cuisine[data-volet="etapes"] #cu-ingredients { display: none; }
+}
+@media (min-width: 800px) {
+  .cu-onglets { display: none; }
+  .cu-bar { padding-left: 16px; padding-right: 16px; gap: 6px; }
+  .cu-bar h1 { font-size: 20px; }
+  .cu-eveil { padding: 0 12px 0 9px; }
+  .cu-eveil span { display: inline; }
+  .cu-corps { grid-template-columns: minmax(280px, 2fr) 3fr; }
+  #cu-ingredients { border-right: 1px solid var(--border); }
+  .cu-volet { padding: 22px 32px 40px; }
+  .cu-volet > .label:first-child { display: block; margin: 0 0 10px; }
+  #cu-etapes > * { max-width: 46em; }
+}
+
+/* --------------------------------------------------------------- souris */
+/* Survol : seulement là où il y a une vraie souris (jamais au doigt, où un
+   survol resterait collé après le toucher). */
+.item-outils { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover:not(:disabled):not(.btn-primary):not(.on):not(.viewer-open), .icon-btn:hover:not(:disabled),
+  .menu-item:hover, .nav-row:hover, .completion:hover, .pas button:hover:not(:disabled),
+  .cu-onglets button:hover:not([aria-selected="true"]) { background: var(--surface-2); }
+  .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+  .viewer-bar .icon-btn:hover:not(:disabled) { background: var(--graphite); }   /* visionneuse : toujours sur fond Noir */
+  .puce:hover:not(.on), .pill:hover:not(.on):not(.static) { color: var(--tag-text); background: var(--tag-bg); }
+  .nav-row:hover { margin: 0 -14px; padding: 0 14px; width: calc(100% + 28px); }
+  .list-row:hover, .item-front:hover, .cu-etape:hover:not([aria-current]) { border-color: var(--text-disabled); }
+  .tile-main:hover img { opacity: 0.88; }
+  .tile.sans-image:hover { outline: 1px solid var(--text-disabled); outline-offset: -1px; }
+  .tab:hover { color: var(--text); }
+  .link-btn:hover { text-decoration-thickness: 2px; }
+  /* « … » et poubelle d'un article : la place est toujours réservée (rien ne
+     bouge), ils paraissent au survol ou au clavier. */
+  .item-outils { display: flex; opacity: 0; }
+  .item-outils .icon-btn { width: 36px; height: 36px; }
+  .item-outils .ic { width: 20px; height: 20px; }
+  .item-front:hover .item-outils, .item-outils:focus-within { opacity: 1; }
+}
+
+/* ----------------------------------------------------------- ordinateur */
+/* Fenêtre large (même seuil que estLarge() dans lib/ui.js) : barre latérale
+   à gauche au lieu de la barre d'onglets, contenu sur toute la largeur,
+   Courses et Menu en deux volets qui défilent chacun pour soi, feuilles en
+   fenêtres centrées. Le téléphone n'est pas touché par ce bloc. */
+.rail-marque { display: none; }
+.list-row[aria-current="true"] { border-color: var(--focus-ring); background: var(--tag-bg); }
+.item.actif .item-front { border-color: var(--focus-ring); }
+
+@media (min-width: 900px) {
+  :root { --rail: 224px; --marge: 28px; --volet-courses: 340px; --volet-menu: 420px; }
+
+  #app {
+    max-width: none;
+    display: grid;
+    grid-template-columns: var(--rail) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+  .center-screen, .loading-screen { grid-column: 1 / -1; grid-row: 1 / -1; }
+  .net-banner { grid-column: 2; grid-row: 1; }
+  .screen { grid-column: 2; grid-row: 2; padding: 24px var(--marge) 32px; gap: 14px; }
+  .screen::before { display: none; }   /* le rebond d'iOS n'existe pas ici : pas de défilement forcé */
+  .dock { grid-column: 2; grid-row: 3; }
+  .screen, .volet, .sheet, .cu-volet { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+  /* Barre latérale */
+  .tabbar {
+    grid-column: 1; grid-row: 1 / -1;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 4px;
+    padding: 20px 12px;
+    border-top: 0;
+    border-right: 1px solid var(--border);
+  }
+  body.clavier .tabbar { display: flex; }
+  .rail-marque {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 8px 18px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .rail-marque img { width: 36px; height: 36px; border-radius: 9px; }
+  .tab {
+    flex: none;
+    width: 100%;
+    max-width: none;
+    height: 46px;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 0 8px;
+    font-size: 15px;
+    border-radius: var(--radius-sm);
+  }
+  .tab .ic { width: 42px; height: 28px; padding: 3px 10px; border-radius: 14px; }
+  .tab[aria-current="page"] { background: var(--surface-2); }
+
+  /* Largeur du contenu, selon l'écran */
+  .screen > * { max-width: 760px; }
+  .screen[data-ecran="recettes"] > * { max-width: 1320px; }
+  .screen[data-ecran="recettes"] > #rf { max-width: 760px; }
+  .screen[data-ecran="recettes"] > .fiche { max-width: 1120px; }
+  .screen > .volets { max-width: none; }
+  .screen-head h1 { font-size: 28px; }
+  .fiche > .list-head h1 { font-size: 28px; white-space: normal; }
+
+  /* Deux volets (Courses, Menu) : l'écran ne défile plus, chaque volet oui. */
+  .screen:has(> .volets) { padding: 0; overflow: hidden; }
+  #ep.volets, #mn.volets {
+    flex: 1 1 0;
+    min-height: 0;
+    display: grid;
+    gap: 0;
+    grid-template-columns: var(--volet-courses) minmax(0, 1fr);
+  }
+  #mn.volets { grid-template-columns: var(--volet-menu) minmax(0, 1fr); }
+  .volet {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 24px var(--marge) 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .volet > * { flex-shrink: 0; }
+  .colonne { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+  .colonne > .volet { flex: 1 1 0; }
+  .volets > :first-child { border-right: 1px solid var(--border); }
+  .volet-g { padding-left: 20px; padding-right: 20px; }
+  .volet-d > * { max-width: 760px; }
+  #mn-fiche > * { max-width: 900px; }
+  .volets [data-ep="back"] { display: none; }   /* les listes sont déjà là, à gauche */
+  .volets .list-head > .emoji-pill { margin-left: 0; }
+  .volet-g .list-open { min-height: 56px; }
+  .volet-g .list-count { font-size: 13px; }
+
+  /* Boîte d'ajout : au pied du volet qu'elle alimente (la liste ouverte, à
+     droite, pour Courses ; le menu, à gauche, pour Menu). */
+  .ajout { padding: 12px var(--marge) 16px; }
+  #ep-dock .ajout > * { max-width: 760px; }
+  #mn-dock .ajout { padding-left: 20px; padding-right: 20px; }
+
+  /* Recettes */
+  .tiles { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+  .tile-name { padding: 30px 12px 11px; font-size: 14px; }
+  .tile.sans-image .tile-fallback { inset: 0 0 44px; font-size: 15px; }
+  #rc-q { max-width: 440px; }
+  #rc-filters { flex-direction: row; align-items: center; flex-wrap: wrap; }
+  #rc-filters .puces { flex-wrap: wrap; overflow: visible; }
+
+  /* Feuilles : des fenêtres centrées */
+  .scrim { align-items: center; padding: 24px; }
+  .sheet {
+    max-width: 480px;
+    max-height: 100%;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 24px 64px var(--scrim);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: transform 0.2s ease, opacity 0.2s;
+  }
+  .scrim.open .sheet { opacity: 1; transform: none; }
+  .grab { display: none; }
+
+  /* D'un écran à l'autre : un fondu court (le glissement d'iOS n'a pas sa place
+     sur un grand écran, encore moins d'un volet à l'autre). */
+  ::view-transition-group(ecran), ::view-transition-group(dock),
+  ::view-transition-old(ecran), ::view-transition-new(ecran),
+  ::view-transition-old(dock), ::view-transition-new(dock) { animation-duration: 0.14s; animation-timing-function: ease; }
+  :root[data-nav]::view-transition-new(ecran), :root[data-nav]::view-transition-new(dock) { animation-name: nav-fondu-entre; }
+  :root[data-nav]::view-transition-old(ecran), :root[data-nav]::view-transition-old(dock) { animation-name: nav-fondu-sort; }
+  .screen.nav-avant, .screen.nav-arriere { animation: nav-fondu-entre 0.14s ease; }
+}
+@keyframes nav-fondu-entre { from { opacity: 0; } }
+@keyframes nav-fondu-sort { to { opacity: 0; } }

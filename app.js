@@ -2,10 +2,11 @@ import { supabase } from "./lib/supabase.js";
 import { isConfigured } from "./lib/config.js";
 import { T } from "./lib/textes.js";
 import { icon } from "./lib/icons.js";
-import { esc, toast, closeSheet, sheetIsOpen, initViewport, naviguer } from "./lib/ui.js";
+import { esc, toast, closeSheet, sheetIsOpen, initViewport, naviguer, surChangementDeFormat } from "./lib/ui.js";
 import { renderEpicerie, showLists } from "./lib/epicerie.js";
 import { renderRecettes, showRecettesGrid, recetteFromShare } from "./lib/recettes.js";
 import { renderMenu, showMenuList } from "./lib/menu.js";
+import "./lib/cuisine.js";   // mode Cuisine : bouton « Cuisiner » des fiches (data-cu)
 import { flushUploads, pendingUploads } from "./lib/media.js";
 import {
   configureReglages, reglagesNavHtml, reglagesSubview, renderReglagesSubview, closeReglagesSubview,
@@ -18,7 +19,7 @@ import {
 // ------------------------------------------------------------------ state ---
 // Version affichée dans Réglages (majeure.mineure.correctif). À monter avec
 // CACHE dans sw.js : correctif pour des corrections, mineure pour des ajouts.
-const VERSION = "0.14.0";
+const VERSION = "0.15.0";
 const TAB_KEY = "wasabi-onglet";
 const TABS = [
   { id: "epicerie", icone: "panier" },
@@ -120,6 +121,7 @@ function renderApp() {
     <main class="screen" id="screen"></main>
     <div class="dock" id="dock"></div>
     <nav class="tabbar" aria-label="Sections">
+      <div class="rail-marque"><img src="assets/icon-192.png" alt=""><span>${T.app}</span></div>
       ${TABS.map((t) => `
         <button class="tab" data-tab="${t.id}" aria-current="${t.id === ui.tab ? "page" : "false"}">
           ${icon(t.icone)}<span>${T.onglets[t.id]}</span>
@@ -132,6 +134,9 @@ function renderApp() {
 function renderScreen() {
   const screen = document.getElementById("screen");
   if (!screen) return;
+  // Largeur du contenu à l'ordinateur (app.css § ordinateur). Pas « data-tab » :
+  // tout clic dans l'écran passerait pour un toucher d'onglet.
+  screen.dataset.ecran = ui.tab;
   // L'épicerie se met à jour par morceaux (le champ d'ajout garde le focus).
   const dock = document.getElementById("dock");
   if (ui.tab === "epicerie") { renderEpicerie(screen, dock); return; }
@@ -612,4 +617,7 @@ configureReglages({
   },
 });
 initViewport();
+// Fenêtre élargie ou rétrécie au-delà du seuil : Courses et Menu passent d'un
+// écran à deux volets (ou l'inverse) ; les autres écrans ne changent que par le CSS.
+surChangementDeFormat(() => renderScreen());
 boot();

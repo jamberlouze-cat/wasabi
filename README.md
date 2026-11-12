@@ -14,6 +14,13 @@ Documents de référence : `FEUILLE_DE_ROUTE.md` (portée et phases),
 PDF), aperçu de lien par le Worker, images réduites sur le téléphone et gardées
 hors ligne, catégories et tags.
 
+**Ordinateur et mode Cuisine (0.15.0).** À partir de 900 px de large : barre
+latérale, Courses et Menu en deux volets, fiche de recette sur deux colonnes,
+feuilles en fenêtres centrées, « … » et poubelle au survol d'un article. Le bouton
+« Cuisiner » d'une fiche ouvre la recette en grand (ingrédients à rayer, étape en
+cours, flèches du clavier) et garde l'écran allumé (Screen Wake Lock : iOS 16.4
+dans Safari, iOS 18.4 dans l'app installée ; refusé, l'écran suit sa veille habituelle).
+
 **Courses (phases 1 et 2).** Listes avec emoji, articles, quantités, boîte
 d'ajout avec suggestions par fréquence et autocomplétion sur la mémoire du foyer,
 tout cocher / décocher / effacer les cochés, temps réel et hors ligne. Articles classés
@@ -96,12 +103,14 @@ lib/store.js            couche hors ligne : copie locale + file de patchs par ch
 lib/epicerie.js         onglet Courses : listes, articles, boîte d'ajout collée au clavier
 lib/menu.js             onglet Menu : menu de la semaine (repas sans jour ni date), boîte d'ajout
 lib/recettes.js         onglet Recettes : grille, fiche, formulaire, visionneuse, envoi des ingrédients à l'épicerie
+lib/cuisine.js          mode Cuisine : ingrédients et étapes en grand, par-dessus toute l'app
+lib/eveil.js            écran gardé allumé (Screen Wake Lock) pour le mode Cuisine et la visionneuse
 lib/ingredients.js      ligne d'ingrédient → nom d'article et quantité (« 375 ml de bouillon de bœuf » → « Bouillon de bœuf »)
 lib/media.js            images et PDF : compression, cache sur l'appareil, envoi différé
 lib/reglages-vues.js    Réglages > Allées, Mes articles, Catégories, Tags
 lib/glisser.js          glisser-déposer par appui long (listes, allées)
 lib/noms.js             noms normalisés + identifiants stables (pas de doublon à la synchro)
-lib/ui.js               échappement, toasts, feuilles du bas
+lib/ui.js               échappement, toasts, feuilles du bas, format large (estLarge : ordinateur)
 lib/textes.js           toutes les chaînes de l'interface (français)
 lib/icons.js            icônes SVG en ligne
 lib/pdf.js              PDF dessinés page par page (pdf.js), vignette de la 1re page

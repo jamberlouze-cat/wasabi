@@ -12,7 +12,7 @@ App maison pour deux utilisateurs (Maxime et sa conjointe), qui remplace Umami. 
 
 ## 2. Principes directeurs
 
-1. **Mobile first, iPhone d'abord.** Doit aussi fonctionner sur Android. L'ordinateur est secondaire : l'interface mobile centrée dans une colonne suffit.
+1. **Mobile first, iPhone d'abord.** Doit aussi fonctionner sur Android. L'ordinateur est secondaire, mais complet depuis le 2026-11-12 (0.15.0) : à partir de 900 px de large, barre latérale, Courses et Menu en deux volets, fiche de recette sur deux colonnes, feuilles en fenêtres centrées, gestes à la souris. Sous ce seuil, rien ne change.
 2. **PWA installable**, pleinement utilisable hors ligne.
 3. **Français seulement** (termes québécois). Pas d'infrastructure i18n pour l'instant, mais garder les chaînes regroupées pour faciliter un ajout futur.
 4. **Simplicité avant tout.** En cas de doute entre deux options, choisir celle qui demande le moins de gestes à l'utilisateur et le moins de code.
@@ -44,7 +44,7 @@ Reprendre le même socle que **Calico** et **Panache** :
 
 ### Exclu
 
-Import de recettes par IA (la lecture des données structurées publiées par les sites a été ajoutée le 2026-10-19, voir § 6.2), mode cuisine, minuteries, mise à l'échelle des portions, évaluations, planification des repas par jour (un menu de la semaine sans jour ni date a été ajouté le 2026-10-14), intégration Rappels iOS, liens publics de partage, extension de navigateur, multilingue, abonnement.
+Import de recettes par IA (la lecture des données structurées publiées par les sites a été ajoutée le 2026-10-19, voir § 6.2), minuteries (le mode cuisine, lui, a été ajouté le 2026-11-12 : ingrédients et étapes en grand, écran gardé allumé), mise à l'échelle des portions, évaluations, planification des repas par jour (un menu de la semaine sans jour ni date a été ajouté le 2026-10-14), intégration Rappels iOS, liens publics de partage, extension de navigateur, multilingue, abonnement.
 
 ### Plus tard
 
