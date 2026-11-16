@@ -122,6 +122,7 @@ migration-phase2.sql    gabarit des 13 allées + note d'article, à passer une f
 migration-revision1.sql droits des membres, liens recette-tag, foyer unique par compte (relecture du 2026-09-24), à passer une fois
 migration-menu.sql      table menu_items + compteur de mise au menu des recettes (0.11.0), à passer une fois AVANT de publier
 migration-menu-ordre.sql ordre des repas du Menu, menu_items.position (0.16.0), à passer une fois AVANT de publier
+migration-a-essayer.sql état « À essayer » des recettes, recipes.a_essayer (0.17.0), à passer une fois AVANT de publier
 catalogue.csv           catalogue d'articles (nom, synonymes séparés par « | », cle_allee) — à corriger ici
 catalogue.sql           généré par `python3 _dev/catalogue_sql.py`, à passer dans Supabase
 worker.js               waker Supabase, /_ping, habillage de l'aperçu, /api/ (aperçu de lien

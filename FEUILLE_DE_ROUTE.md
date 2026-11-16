@@ -145,7 +145,7 @@ Barre d'onglets en bas : **Épicerie** (« Courses ») · **Menu** · **Recettes
 
 ### 6.2 Recettes
 
-**Page principale.** Grille de tuiles à 2 colonnes : photo + nom. En haut : champ de recherche (par nom), puis une rangée de pastilles de catégories à défilement horizontal, puis un bouton de filtre par tags (combinables, logique ET). Tuile sans image : fond de couleur + nom du site ou initiale. Tuiles en ordre alphabétique (depuis le 2026-11-16 ; avant : les plus récentes d'abord). Tag **« À essayer »** (2026-11-16) : posé d'office sur une nouvelle recette (décochable dans le formulaire), montré en pastille sur la tuile, retiré seul quand le repas est coché au Menu.
+**Page principale.** Grille de tuiles à 2 colonnes : photo + nom. En haut : champ de recherche (par nom), puis une rangée de pastilles de catégories à défilement horizontal, puis un bouton de filtre par tags (combinables, logique ET). Tuile sans image : fond de couleur + nom du site ou initiale. Tuiles en ordre alphabétique (depuis le 2026-11-16 ; avant : les plus récentes d'abord). **« À essayer »** (2026-11-16, état de la recette et non un tag depuis 0.17.0) : vrai d'office pour une nouvelle recette, pastille sur la tuile et filtre en tête des pastilles ; faux quand le repas est coché au Menu ou par « Je l'ai essayée » sur la fiche, qui offre aussi « Marquer à essayer ». Les recettes déjà au carnet ne sont pas marquées.
 
 **Toucher une tuile.**
 - Type `url` : ouvre le site. Un appui long (ou un bouton « i » sur la tuile) ouvre la fiche de détail pour voir les notes et modifier.

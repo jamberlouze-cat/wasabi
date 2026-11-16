@@ -154,6 +154,7 @@ create table if not exists public.recipes (
   steps_text       text,   -- types 'manual' et 'url'
   menu_count       int  not null default 0,   -- pastilles du Menu
   last_menu_at     timestamptz,
+  a_essayer        boolean not null default false,   -- jamais cuisinée (vrai d'office à l'ajout)
   created_at       timestamptz not null default now(),
   updated_at       timestamptz not null default now(),
   deleted_at       timestamptz,
@@ -161,6 +162,7 @@ create table if not exists public.recipes (
 );
 alter table public.recipes add column if not exists menu_count   int not null default 0;
 alter table public.recipes add column if not exists last_menu_at timestamptz;
+alter table public.recipes add column if not exists a_essayer    boolean not null default false;
 create index if not exists idx_recipes_hh on public.recipes(household_id);
 
 -- Fichiers d'une recette de type 'file' (ex. une recette sur deux pages).

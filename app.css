@@ -681,6 +681,8 @@ body.clavier .tabbar { display: none; }
   touch-action: manipulation;
 }
 .link-btn.left { text-align: left; align-self: flex-start; }
+/* Même hauteur que « Je l'ai essayée » : la fiche ne bouge pas quand on passe de l'un à l'autre. */
+.link-btn.essai { display: block; width: 100%; min-height: 48px; text-align: center; }
 .form > .link-btn { align-self: center; min-height: 40px; }
 .inline.wrap { flex-wrap: wrap; }
 .prose { white-space: pre-line; overflow-wrap: anywhere; }
