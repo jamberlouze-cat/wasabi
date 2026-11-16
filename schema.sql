@@ -209,6 +209,7 @@ create table if not exists public.menu_items (
   recipe_id    uuid,
   title        text not null,
   done         boolean not null default false,   -- repas fait
+  position     int  not null default 0,          -- ordre choisi au glisser-déposer
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now(),
   deleted_at   timestamptz,

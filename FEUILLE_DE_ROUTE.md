@@ -116,7 +116,7 @@ Compartiment privé `recipe-media`, chemins préfixés par `household_id`, accè
 ## 6. Spécification fonctionnelle
 
 ### Navigation
-Barre d'onglets en bas : **Épicerie** (« Courses ») · **Menu** · **Recettes** · **Réglages**. Le Menu (ajout du 2026-10-14) est une simple liste de repas de la semaine, sans jour ni date : une recette du carnet ou un texte libre, cochée une fois faite. L'app ouvre sur Épicerie, directement sur la dernière liste consultée.
+Barre d'onglets en bas : **Épicerie** (« Courses ») · **Menu** · **Recettes** · **Réglages**. Le Menu (ajout du 2026-10-14) est une simple liste de repas de la semaine, sans jour ni date : une recette du carnet ou un texte libre, cochée une fois faite. Appui long sur un repas pour le déplacer (2026-11-16). L'app ouvre sur Épicerie, directement sur la dernière liste consultée.
 
 ### 6.1 Épicerie
 
@@ -145,7 +145,7 @@ Barre d'onglets en bas : **Épicerie** (« Courses ») · **Menu** · **Recettes
 
 ### 6.2 Recettes
 
-**Page principale.** Grille de tuiles à 2 colonnes : photo + nom. En haut : champ de recherche (par nom), puis une rangée de pastilles de catégories à défilement horizontal, puis un bouton de filtre par tags (combinables, logique ET). Tuile sans image : fond de couleur + nom du site ou initiale.
+**Page principale.** Grille de tuiles à 2 colonnes : photo + nom. En haut : champ de recherche (par nom), puis une rangée de pastilles de catégories à défilement horizontal, puis un bouton de filtre par tags (combinables, logique ET). Tuile sans image : fond de couleur + nom du site ou initiale. Tuiles en ordre alphabétique (depuis le 2026-11-16 ; avant : les plus récentes d'abord). Tag **« À essayer »** (2026-11-16) : posé d'office sur une nouvelle recette (décochable dans le formulaire), montré en pastille sur la tuile, retiré seul quand le repas est coché au Menu.
 
 **Toucher une tuile.**
 - Type `url` : ouvre le site. Un appui long (ou un bouton « i » sur la tuile) ouvre la fiche de détail pour voir les notes et modifier.

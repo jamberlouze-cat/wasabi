@@ -628,6 +628,23 @@ body.clavier .tabbar { display: none; }
   overflow: hidden;
   overflow-wrap: anywhere;
 }
+/* Pastille « À essayer », en haut à gauche, couleurs d'un tag (charte). */
+.tile-badge {
+  position: absolute;
+  top: 6px; left: 6px;
+  max-width: calc(100% - 12px);
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--tag-text);
+  background: var(--tag-bg);
+  pointer-events: none;
+}
 .tile-fallback { display: none; }
 /* Tuile sans photo : fond surface-2, nom du site ou initiale en text-muted. */
 .tile.sans-image .tile-fallback {
